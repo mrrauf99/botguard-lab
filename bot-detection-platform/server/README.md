@@ -31,6 +31,7 @@ npm test
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `GET /api/auth/me` - Get current user (protected)
@@ -39,6 +40,7 @@ npm test
 ## Features Implemented
 
 ### Phase 2: Authentication & Database ✅
+
 - MongoDB connection and Mongoose models
 - User schema with email uniqueness
 - JWT authentication (7-day tokens)
@@ -50,6 +52,7 @@ npm test
 - Error handling
 
 ### Phase 3+
+
 - Behavior tracking API
 - Detection engine
 - Real-time updates (Socket.io)
@@ -81,9 +84,11 @@ src/
 ## Credentials
 
 Admin:
+
 - Email: `admin@botguard.local`
 - Password: `Admin@123`
 
 Sample Users:
+
 - Email: `ahmed_1@botguard.pk` (through `ahmed_50@botguard.pk`)
 - Password: `Password123`
