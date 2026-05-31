@@ -28,6 +28,7 @@
 ## Data Models
 
 ### User
+
 - `email` (string, unique)
 - `password` (string, hashed)
 - `name` (string)
@@ -35,6 +36,7 @@
 - `createdAt` (timestamp)
 
 ### Session
+
 - `userId` (ObjectId)
 - `startTime` (timestamp)
 - `endTime` (timestamp)
@@ -43,6 +45,7 @@
 - `events` (array of event references)
 
 ### Event
+
 - `sessionId` (ObjectId)
 - `type` (enum: mouse, click, scroll, type, navigate)
 - `timestamp` (timestamp)

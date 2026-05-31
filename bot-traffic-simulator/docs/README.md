@@ -7,12 +7,14 @@ The Bot Traffic Simulator is a separate application designed to test the bot det
 ## Components
 
 ### Client (React)
+
 - Target URL configuration
 - Attack type selection
 - Real-time status display
 - Detection result visualization
 
 ### Server (Express)
+
 - Login attack simulation
 - Spam bot simulation
 - Scraper bot simulation
@@ -21,12 +23,15 @@ The Bot Traffic Simulator is a separate application designed to test the bot det
 ## Features
 
 ### 1. Login Attack
+
 Attempts rapid login requests to trigger detection
 
 ### 2. Spam Bot
+
 Generates high-volume form submissions
 
 ### 3. Scraper Bot
+
 Simulates automated page crawling
 
 ## Configuration

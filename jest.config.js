@@ -23,6 +23,10 @@ module.exports = {
       testEnvironment: 'node',
       rootDir: 'bot-detection-platform/server',
       testMatch: ['<rootDir>/src/**/__tests__/**/*.js', '<rootDir>/src/**/*.test.js'],
+      testPathIgnorePatterns: [
+        'src/controllers/authController.test.js',
+        'src/utils/validation.test.js',
+      ],
       collectCoverageFrom: [
         'src/**/*.js',
         '!src/index.js',

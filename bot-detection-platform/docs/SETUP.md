@@ -48,6 +48,7 @@ npm run setup:db
 ```
 
 This creates:
+
 - 50 Pakistani users
 - 1 admin user (admin@botguard.local / Admin@123)
 
@@ -58,22 +59,26 @@ npm run dev
 ```
 
 This starts:
+
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:5000`
 
 ## Verification
 
 ### Lint
+
 ```bash
 npm run lint
 ```
 
 ### Tests
+
 ```bash
 npm test
 ```
 
 ### Build
+
 ```bash
 npm run build
 ```
@@ -106,15 +111,18 @@ mongo
 ## Troubleshooting
 
 ### Port Already in Use
+
 - Frontend: Change in `bot-detection-platform/client/vite.config.js`
 - Backend: Set `PORT` env variable
 
 ### MongoDB Connection Failed
+
 - Verify MongoDB is running
 - Check `MONGODB_URI` in `.env`
 - Check firewall settings
 
 ### Dependencies Issue
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install

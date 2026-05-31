@@ -49,6 +49,7 @@ cp .env.example .env
 ```
 
 Edit `.env` with your configuration:
+
 - `MONGODB_URI`: MongoDB connection string
 - `JWT_SECRET`: Secret key for JWT tokens
 - `PORT`: Server port (default: 5000)
@@ -98,12 +99,14 @@ All of the following must pass before committing:
 ## Development Phases
 
 ### Phase 1: ✅ Monorepo Foundation
+
 - ESLint, Prettier, Jest configuration
 - Environment variables setup
 - npm scripts
 - .gitignore configuration
 
 ### Phase 2: Authentication & Database
+
 - MongoDB connection
 - Mongoose schemas
 - User model with JWT and bcrypt
@@ -111,42 +114,49 @@ All of the following must pass before committing:
 - 50 Pakistani seed users + 1 admin
 
 ### Phase 3: Website Content
+
 - Home, Products, Blog pages
 - Product/Article detail pages
 - Contact & Authentication pages
 - Bright modern UI design
 
 ### Phase 4: Behavior Tracking Engine
+
 - Mouse movement tracking
 - Scroll & click activity
 - Typing behavior
 - Session management
 
 ### Phase 5: Detection Engine
+
 - Request rate analysis
 - Navigation pattern detection
 - Mouse/scroll presence detection
 - Bot classification (0-100 score)
 
 ### Phase 6: Admin Dashboard
+
 - Session analytics
 - Real-time charts
 - Bot/Human/Suspicious statistics
 - Socket.io integration
 
 ### Phase 7: Session Replay
+
 - Mouse movement replay
 - Scroll event replay
 - Click recording
 - Navigation timeline
 
 ### Phase 8: Bot Traffic Simulator
+
 - Login attack simulation
 - Spam bot simulator
 - Scraper bot simulator
 - Detection result display
 
 ### Phase 9: Analytics & Documentation
+
 - Analytics dashboard
 - History tracking
 - Report export
@@ -191,6 +201,7 @@ npm run setup:db
 ```
 
 Admin credentials:
+
 - Email: `admin@botguard.local`
 - Password: `Admin@123`
 
