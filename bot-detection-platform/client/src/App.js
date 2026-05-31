@@ -1,3 +1,5 @@
+import HomePage from './pages/Home';
+
 export default function App() {
-  return 'Bot Detection Platform - Phase 3 coming soon';
+  return HomePage();
 }

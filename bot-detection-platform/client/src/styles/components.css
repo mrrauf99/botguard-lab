@@ -1,0 +1,233 @@
+/* Navigation */
+.navbar {
+  background-color: var(--white);
+  border-bottom: 2px solid var(--gray-100);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--coral) 0%, var(--teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+}
+
+.navbar-nav {
+  display: flex;
+  list-style: none;
+  gap: 0;
+}
+
+.navbar-nav li {
+  position: relative;
+}
+
+.navbar-nav a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--gray-700);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.navbar-nav a:hover {
+  color: var(--coral);
+  border-bottom-color: var(--coral);
+}
+
+.navbar-auth {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--gray-900);
+  color: var(--gray-100);
+  padding: 3rem 0 1rem;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h4 {
+  color: var(--coral);
+  margin-bottom: 1rem;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+  color: var(--gray-300);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+  color: var(--coral);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--gray-700);
+  padding-top: 1.5rem;
+  text-align: center;
+  color: var(--gray-400);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%);
+  padding: 5rem 0;
+  text-align: center;
+  border-bottom: 2px solid var(--gray-100);
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--coral) 0%, var(--teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--gray-600);
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.breadcrumb a {
+  color: var(--coral);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  color: var(--gray-400);
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-500);
+}
+
+.spinner {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--coral);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Alert */
+.alert {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.alert-success {
+  background-color: rgba(32, 201, 151, 0.1);
+  color: var(--teal-dark);
+  border-left: 4px solid var(--teal);
+}
+
+.alert-error {
+  background-color: rgba(255, 107, 107, 0.1);
+  color: var(--coral-dark);
+  border-left: 4px solid var(--coral);
+}
+
+.alert-info {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--gray-700);
+  border-left: 4px solid var(--gray-400);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+
+  .navbar-nav a {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+  }
+}
