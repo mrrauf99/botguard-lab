@@ -112,6 +112,35 @@ const SimulatorPage = () => {
           </div>
         </section>
 
+        <!-- Phase 8 Attack Simulation -->
+        <section class="simulator-section attack-section">
+          <h2>🎯 Attack Simulation (Phase 8)</h2>
+          <p style="color: #6b7280; margin-bottom: 1rem;">Max 10 requests per attack. Stops when BOT detected or session blocked.</p>
+          <div class="control-panel">
+            <div class="control-group" style="flex: 1 1 100%;">
+              <label for="attack-target-url">Target URL</label>
+              <input type="url" id="attack-target-url" value="http://localhost:3000" placeholder="http://localhost:3000" />
+            </div>
+            <div class="control-group" style="flex: 1 1 100%;">
+              <label for="attack-api-url">Detection API URL</label>
+              <input type="url" id="attack-api-url" value="http://localhost:5000" placeholder="http://localhost:5000" />
+            </div>
+          </div>
+          <div class="button-group" style="margin-bottom: 1rem;">
+            <button class="btn-attack" data-attack="login-attack">🔐 Login Attack</button>
+            <button class="btn-attack" data-attack="spam-bot">📝 Spam Bot</button>
+            <button class="btn-attack" data-attack="scraper-bot">🕷️ Scraper Bot</button>
+          </div>
+          <div class="attack-result card" id="attack-result" style="display: none; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <h3 style="margin-bottom: 0.75rem; color: #ff6b6b;">Attack Result</h3>
+            <p><strong>Status:</strong> <span id="attack-status">—</span></p>
+            <p><strong>Requests sent:</strong> <span id="attack-requests">0</span></p>
+            <p><strong>Stopped reason:</strong> <span id="attack-stopped">—</span></p>
+            <p><strong>Classification:</strong> <span id="attack-classification">—</span></p>
+            <p><strong>Risk score:</strong> <span id="attack-score">—</span></p>
+          </div>
+        </section>
+
         <!-- Combined Traffic Section -->
         <section class="simulator-section">
           <h2>🔀 Combined Traffic</h2>
@@ -320,6 +349,25 @@ const SimulatorPage = () => {
           font-size: 0.875rem;
           cursor: pointer;
           transition: all 0.3s ease;
+        }
+
+        .btn-attack {
+          padding: 0.75rem 1rem;
+          border: none;
+          border-radius: 0.375rem;
+          font-weight: 600;
+          background: #ff6b6b;
+          color: white;
+          cursor: pointer;
+        }
+
+        .btn-attack:hover {
+          background: #ee5a52;
+        }
+
+        .btn-attack:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         .btn-start {

@@ -217,6 +217,32 @@ export const getTopReasons = async (req, res) => {
 };
 
 /**
+ * Get recent sessions (all classifications)
+ */
+export const getRecentSessions = async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+
+    const sessions = await Session.find()
+      .sort({ startTime: -1 })
+      .limit(parseInt(limit))
+      .select(
+        '_id sessionToken classification riskScore startTime duration eventCount status'
+      );
+
+    res.json({
+      sessions,
+      limit: parseInt(limit),
+      timestamp: new Date(),
+      message: 'Recent sessions retrieved',
+    });
+  } catch (error) {
+    console.warn(`[Error] Failed to get recent sessions: ${error.message}`);
+    res.status(500).json({ error: 'Failed to get recent sessions' });
+  }
+};
+
+/**
  * Get high-risk sessions
  */
 export const getHighRiskSessions = async (req, res) => {
@@ -263,6 +289,9 @@ export const getSessionDetailedView = async (req, res) => {
       timestamp: event.timestamp,
       x: event.x,
       y: event.y,
+      scrollX: event.scrollX,
+      scrollY: event.scrollY,
+      targetElement: event.targetElement,
     }));
 
     res.json({

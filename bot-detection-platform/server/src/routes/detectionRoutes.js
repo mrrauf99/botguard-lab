@@ -7,12 +7,12 @@ import {
   getSessionsByClassification,
 } from '../controllers/detectionController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
+import { validateSessionAccess } from '../middleware/sessionAccess.js';
 
 const router = express.Router();
 
-// Public routes for analysis
-router.post('/analyze', analyzeSession);
-router.post('/analyze/batch', analyzeSessionsBatch);
+router.post('/analyze', validateSessionAccess, analyzeSession);
+router.post('/analyze/batch', authenticateToken, requireAdmin, analyzeSessionsBatch);
 router.get('/rules', getDetectionRules);
 
 // Protected routes

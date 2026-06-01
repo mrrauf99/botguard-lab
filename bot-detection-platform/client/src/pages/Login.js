@@ -23,7 +23,7 @@ export const LoginPage = () => {
           <h1 class="hero-title">Login</h1>
           <p class="hero-subtitle" style="margin-bottom: 2rem;">Sign in to your BotGuard account</p>
 
-          <form class="card" onsubmit="alert('Login functionality will be implemented with backend integration.'); return false;">
+          <form class="card" id="login-form">
             <div class="form-group">
               <label for="email" class="form-label">Email Address</label>
               <input

@@ -1,5 +1,6 @@
 import BotTrafficGenerator from '../services/botTrafficGenerator.js';
 import HumanTrafficGenerator from '../services/humanTrafficGenerator.js';
+import AttackSimulator from '../services/attackSimulator.js';
 
 const botGenerator = new BotTrafficGenerator();
 const humanGenerator = new HumanTrafficGenerator();
@@ -288,6 +289,40 @@ export const generateSingleBot = async (req, res) => {
 /**
  * Generate single human session
  */
+export const runAttack = async (req, res) => {
+  try {
+    const {
+      type,
+      targetUrl = 'http://localhost:3000',
+      apiUrl = 'http://localhost:5000',
+    } = req.body;
+
+    const attackMap = {
+      'login-attack': (sim) => sim.runLoginAttack(),
+      'spam-bot': (sim) => sim.runSpamBot(),
+      'scraper-bot': (sim) => sim.runScraperBot(),
+    };
+
+    const runner = attackMap[type];
+    if (!runner) {
+      return res.status(400).json({ error: 'Invalid attack type' });
+    }
+
+    const simulator = new AttackSimulator(apiUrl, targetUrl);
+    const result = await runner(simulator);
+
+    console.warn(`[SimulatorController] Attack completed: ${type}`);
+
+    res.json({
+      ...result,
+      message: `${type} attack completed`,
+    });
+  } catch (error) {
+    console.warn(`[Error] Attack failed: ${error.message}`);
+    res.status(500).json({ error: 'Attack simulation failed: ' + error.message });
+  }
+};
+
 export const generateSingleHuman = async (req, res) => {
   try {
     const { type = 'normal' } = req.body;

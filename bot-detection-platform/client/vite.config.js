@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   root: './',
   publicDir: 'public',
+  envPrefix: 'VITE_',
   build: {
     outDir: 'dist',
   },

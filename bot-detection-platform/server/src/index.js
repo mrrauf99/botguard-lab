@@ -9,6 +9,7 @@ import eventRoutes from './routes/eventRoutes.js';
 import detectionRoutes from './routes/detectionRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import { securityHeaders } from './middleware/securityHeaders.js';
 
 dotenv.config();
 
@@ -19,8 +20,18 @@ const PORT = process.env.PORT || 5000;
 // Initialize Socket.io
 initializeSocketIO(httpServer);
 
-app.use(cors());
-app.use(express.json());
+app.set('trust proxy', 1);
+app.use(securityHeaders);
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN?.split(',') || [
+      'http://localhost:3000',
+      'http://localhost:5173',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  })
+);
+app.use(express.json({ limit: '2mb' }));
 
 // Routes
 app.use('/auth', authRoutes);

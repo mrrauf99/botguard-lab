@@ -10,6 +10,7 @@ import {
   resetStats,
   generateSingleBot,
   generateSingleHuman,
+  runAttack,
 } from '../controllers/simulatorController.js';
 
 const router = express.Router();
@@ -29,5 +30,7 @@ router.post('/stats/reset', resetStats);
 // Single session generators
 router.post('/generate/bot', generateSingleBot);
 router.post('/generate/human', generateSingleHuman);
+
+router.post('/attack', runAttack);
 
 export default router;

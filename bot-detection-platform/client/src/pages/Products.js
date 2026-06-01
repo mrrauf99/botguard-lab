@@ -42,7 +42,7 @@ export const ProductsPage = () => {
                 <li style="color: var(--gray-600); margin-bottom: 0.25rem;">✓ Pattern Recognition</li>
                 <li style="color: var(--gray-600); margin-bottom: 0.25rem;">✓ Machine Learning</li>
               </ul>
-              <a href="#" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Learn More</a>
+              <a href="/products/behavioral-engine" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Learn More</a>
             </div>
             <div class="card">
               <h3 style="margin-bottom: 0.5rem; color: var(--coral);">📊 Session Tracking</h3>
@@ -66,7 +66,7 @@ export const ProductsPage = () => {
                 <li style="color: var(--gray-600); margin-bottom: 0.25rem;">✓ Charts & Graphs</li>
                 <li style="color: var(--gray-600); margin-bottom: 0.25rem;">✓ Export Reports</li>
               </ul>
-              <a href="#" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Learn More</a>
+              <a href="/products/session-tracking" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Learn More</a>
             </div>
             <div class="card">
               <h3 style="margin-bottom: 0.5rem; color: var(--coral);">▶️ Session Replay</h3>
@@ -78,7 +78,7 @@ export const ProductsPage = () => {
                 <li style="color: var(--gray-600); margin-bottom: 0.25rem;">✓ Full History</li>
                 <li style="color: var(--gray-600); margin-bottom: 0.25rem;">✓ Playback Controls</li>
               </ul>
-              <a href="#" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Learn More</a>
+              <a href="/products/session-replay" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Learn More</a>
             </div>
             <div class="card">
               <h3 style="margin-bottom: 0.5rem; color: var(--coral);">🔌 API Integration</h3>

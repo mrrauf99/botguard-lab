@@ -59,7 +59,7 @@ export const ContactPage = () => {
 
             <div>
               <h2 style="margin-bottom: 1.5rem; color: var(--teal);">Send us a Message</h2>
-              <form class="card" onsubmit="alert('Thank you for your message! We will get back to you soon.'); return false;">
+              <form class="card" id="contact-form">
                 <div class="form-group">
                   <label for="name" class="form-label">Name</label>
                   <input type="text" id="name" class="form-input" placeholder="Your name" required />

@@ -1,4 +1,5 @@
 import { io } from 'https://cdn.socket.io/4.5.4/socket.io.esm.min.js';
+import { getStoredToken } from './auth.js';
 
 class NotificationManager {
   constructor(apiUrl = 'http://localhost:5000') {
@@ -167,7 +168,7 @@ class NotificationManager {
    */
   async fetchNotifications(limit = 20, skip = 0) {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) {
         console.warn('[NotificationManager] No auth token available');
         return null;
@@ -195,7 +196,7 @@ class NotificationManager {
    */
   async fetchUnreadCount() {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) return null;
 
       const response = await fetch(`${this.apiUrl}/notifications/unread-count`, {
@@ -225,7 +226,7 @@ class NotificationManager {
    */
   async markAsRead(notificationId) {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) return null;
 
       const response = await fetch(`${this.apiUrl}/notifications/mark-read`, {
@@ -252,7 +253,7 @@ class NotificationManager {
    */
   async markAllAsRead() {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) return null;
 
       const response = await fetch(`${this.apiUrl}/notifications/mark-all-read`, {
@@ -281,7 +282,7 @@ class NotificationManager {
    */
   async deleteNotification(notificationId) {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) return null;
 
       const response = await fetch(`${this.apiUrl}/notifications/${notificationId}`, {
@@ -316,7 +317,7 @@ class NotificationManager {
       this.requestNotificationPermission();
 
       // Fetch initial data
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (token) {
         await Promise.all([this.fetchNotifications(20), this.fetchUnreadCount()]);
       }

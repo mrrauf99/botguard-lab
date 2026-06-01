@@ -250,7 +250,10 @@ class BehaviorTracker {
       const response = await fetch(`${this.apiUrl}/events/sessions/end`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: this.sessionId }),
+        body: JSON.stringify({
+          sessionId: this.sessionId,
+          sessionToken: this.sessionToken,
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to end session');

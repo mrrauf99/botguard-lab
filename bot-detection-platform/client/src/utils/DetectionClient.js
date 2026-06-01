@@ -19,10 +19,11 @@ class DetectionClient {
         return null;
       }
 
+      const sessionToken = sessionStorage.getItem('botguard_sessionToken');
       const response = await fetch(`${this.apiUrl}/detection/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, sessionToken }),
       });
 
       if (!response.ok) throw new Error('Failed to analyze session');

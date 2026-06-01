@@ -1,11 +1,10 @@
-import fetch from 'node-fetch';
-
 class HumanTrafficGenerator {
   constructor(apiUrl = 'http://localhost:5000', simulatorUrl = 'http://localhost:3000') {
     this.apiUrl = apiUrl;
     this.simulatorUrl = simulatorUrl;
     this.isRunning = false;
     this.sessionIds = [];
+    this.sessionTokens = new Map();
     this.trafficStats = {
       totalSessions: 0,
       totalEvents: 0,
@@ -196,6 +195,7 @@ class HumanTrafficGenerator {
 
       const data = await response.json();
       this.sessionIds.push(data.sessionId);
+      this.sessionTokens.set(data.sessionId, data.sessionToken);
       this.trafficStats.totalSessions += 1;
       return data.sessionId;
     } catch (error) {
@@ -245,18 +245,18 @@ class HumanTrafficGenerator {
    */
   async endSession(sessionId) {
     try {
-      // End session
+      const sessionToken = this.sessionTokens.get(sessionId);
+
       await fetch(`${this.apiUrl}/events/sessions/end`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, sessionToken }),
       });
 
-      // Trigger detection analysis
       await fetch(`${this.apiUrl}/detection/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, sessionToken }),
       });
 
       return true;

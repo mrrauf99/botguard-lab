@@ -42,7 +42,7 @@ export const BlogPage = () => {
                 <span>May 28, 2026</span>
                 <span>5 min read</span>
               </div>
-              <a href="#" class="btn btn-secondary" style="width: 100%;">Read Article</a>
+              <a href="/blog/bot-traffic-patterns" class="btn btn-secondary" style="width: 100%;">Read Article</a>
             </div>
             <div class="card">
               <div style="margin-bottom: 0.75rem;">
@@ -56,7 +56,7 @@ export const BlogPage = () => {
                 <span>May 25, 2026</span>
                 <span>8 min read</span>
               </div>
-              <a href="#" class="btn btn-secondary" style="width: 100%;">Read Article</a>
+              <a href="/blog/ml-bot-detection" class="btn btn-secondary" style="width: 100%;">Read Article</a>
             </div>
             <div class="card">
               <div style="margin-bottom: 0.75rem;">
@@ -70,7 +70,7 @@ export const BlogPage = () => {
                 <span>May 22, 2026</span>
                 <span>12 min read</span>
               </div>
-              <a href="#" class="btn btn-secondary" style="width: 100%;">Read Article</a>
+              <a href="/blog/web-security-practices" class="btn btn-secondary" style="width: 100%;">Read Article</a>
             </div>
             <div class="card">
               <div style="margin-bottom: 0.75rem;">

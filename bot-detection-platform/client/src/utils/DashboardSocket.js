@@ -1,4 +1,5 @@
 import { io } from 'https://cdn.socket.io/4.5.4/socket.io.esm.min.js';
+import { getAuthHeaders } from './api.js';
 import {
   updateStatWidgets,
   updateSessionsTable,
@@ -45,11 +46,11 @@ class DashboardSocket {
         this.isConnected = false;
       });
 
-      // Listen for stats updates
       this.dashboardSocket.on('stats-update', (stats) => {
         console.warn('[DashboardSocket] Stats update received');
         this.stats = stats;
         updateStatWidgets(stats);
+        updatePieChart(stats);
       });
 
       // Listen for new sessions
@@ -105,7 +106,9 @@ class DashboardSocket {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const response = await fetch(`${this.apiUrl}/dashboard/stats?${params}`);
+      const response = await fetch(`${this.apiUrl}/dashboard/stats?${params}`, {
+        headers: getAuthHeaders(),
+      });
       if (!response.ok) throw new Error('Failed to fetch stats');
 
       const stats = await response.json();
@@ -124,7 +127,9 @@ class DashboardSocket {
    */
   async fetchTrends(days = 7) {
     try {
-      const response = await fetch(`${this.apiUrl}/dashboard/trends?days=${days}`);
+      const response = await fetch(`${this.apiUrl}/dashboard/trends?days=${days}`, {
+        headers: getAuthHeaders(),
+      });
       if (!response.ok) throw new Error('Failed to fetch trends');
 
       const data = await response.json();
@@ -142,7 +147,9 @@ class DashboardSocket {
    */
   async fetchRiskDistribution() {
     try {
-      const response = await fetch(`${this.apiUrl}/dashboard/risk-distribution`);
+      const response = await fetch(`${this.apiUrl}/dashboard/risk-distribution`, {
+        headers: getAuthHeaders(),
+      });
       if (!response.ok) throw new Error('Failed to fetch risk distribution');
 
       const data = await response.json();
@@ -161,7 +168,9 @@ class DashboardSocket {
   async fetchRecentSessions(limit = 10) {
     try {
       // Get high-risk sessions first for sorting
-      const response = await fetch(`${this.apiUrl}/dashboard/high-risk-sessions?limit=${limit}`);
+      const response = await fetch(`${this.apiUrl}/dashboard/recent-sessions?limit=${limit}`, {
+        headers: getAuthHeaders(),
+      });
       if (!response.ok) throw new Error('Failed to fetch recent sessions');
 
       const data = await response.json();
@@ -179,7 +188,8 @@ class DashboardSocket {
   async fetchHighRiskSessions(limit = 10, threshold = 60) {
     try {
       const response = await fetch(
-        `${this.apiUrl}/dashboard/high-risk-sessions?limit=${limit}&threshold=${threshold}`
+        `${this.apiUrl}/dashboard/high-risk-sessions?limit=${limit}&threshold=${threshold}`,
+        { headers: getAuthHeaders() }
       );
       if (!response.ok) throw new Error('Failed to fetch high-risk sessions');
 

@@ -1,8 +1,20 @@
 import Session from '../models/Session.js';
 import Event from '../models/Event.js';
+import LoginAttempt from '../models/LoginAttempt.js';
 import DetectionService from '../services/detectionService.js';
 import NotificationService from '../services/notificationService.js';
 import { emitDetectionResult } from '../services/socketService.js';
+import { pushDashboardStatsUpdate } from '../services/dashboardStatsService.js';
+
+const getRecentFailedLogins = async (ipAddress) => {
+  if (!ipAddress) return 0;
+  const since = new Date(Date.now() - 15 * 60 * 1000);
+  return LoginAttempt.countDocuments({
+    ipAddress,
+    success: false,
+    createdAt: { $gte: since },
+  });
+};
 
 const detectionService = new DetectionService();
 const notificationService = new NotificationService();
@@ -18,14 +30,21 @@ export const analyzeSession = async (req, res) => {
       return res.status(400).json({ error: 'sessionId is required' });
     }
 
-    const session = await Session.findById(sessionId);
+    const session = req.session || (await Session.findById(sessionId));
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    const events = await Event.find({ sessionId }).sort({ timestamp: 1 });
+    if (session.status === 'blocked') {
+      return res.status(403).json({ error: 'Session is blocked', classification: 'BOT' });
+    }
 
-    const analysis = detectionService.analyzeSession(session, events);
+    const events = await Event.find({ sessionId }).sort({ timestamp: 1 });
+    const recentFailedLogins = await getRecentFailedLogins(session.ipAddress);
+
+    const analysis = detectionService.analyzeSession(session, events, {
+      recentFailedLogins,
+    });
 
     // Update session with analysis results
     session.riskScore = analysis.riskScore;
@@ -39,14 +58,18 @@ export const analyzeSession = async (req, res) => {
     session.flags.hasUnusualClickPattern = analysis.reasons.some((r) => r.includes('click'));
     session.flags.hasHighRequestRate = analysis.reasons.some((r) => r.includes('rate'));
 
+    if (analysis.classification === 'BOT' || analysis.riskScore >= 60) {
+      session.status = 'blocked';
+    }
+
     await session.save();
 
     console.warn(
       `[Detection] Session analyzed: ${sessionId}, Score: ${analysis.riskScore}, Class: ${analysis.classification}`
     );
 
-    // Emit real-time update
     emitDetectionResult(sessionId, analysis);
+    await pushDashboardStatsUpdate();
 
     // Create notification if bot or high-risk
     if (analysis.classification === 'BOT') {
@@ -68,6 +91,8 @@ export const analyzeSession = async (req, res) => {
       classification: analysis.classification,
       confidence: analysis.confidence,
       reasons: analysis.reasons,
+      status: session.status,
+      blocked: session.status === 'blocked',
       message: 'Session analysis completed',
     });
   } catch (error) {
@@ -251,6 +276,18 @@ export const getDetectionRules = async (req, res) => {
         description: 'Repetitive clicking on same element',
         weight: 10,
         threshold: '> 5 consecutive clicks',
+      },
+      {
+        name: 'High Request Rate',
+        description: 'Abnormally high event volume per second',
+        weight: 14,
+        threshold: '> 8 events/sec',
+      },
+      {
+        name: 'Repeated Logins',
+        description: 'Multiple failed login attempts from same IP',
+        weight: 18,
+        threshold: '>= 5 failures in 15 min',
       },
     ];
 

@@ -248,7 +248,7 @@ export const updatePieChart = (stats) => {
   ];
 
   const labels = ['Human', 'Suspicious', 'Bot'];
-  const colors = ['#1dd1a1', '#ff6b6b', '#1e90ff'];
+  const colors = ['#1dd1a1', '#ff6b6b', '#20c997'];
 
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -274,7 +274,7 @@ export const updateBarChart = (distribution) => {
 
   const data = sorted.map((item) => item.count);
   const labels = sorted.map((item) => item._id.split(' ')[0]); // Get range part
-  const colors = ['#1dd1a1', '#ff6b6b', '#1e90ff'];
+  const colors = ['#1dd1a1', '#ff6b6b', '#20c997'];
 
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);

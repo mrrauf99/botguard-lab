@@ -94,13 +94,15 @@ export const createSessionRow = (session) => {
 
   const startDate = new Date(session.startTime).toLocaleString();
 
-  const classificationClass = session.classification.toLowerCase();
+  const classification = session.classification || 'PENDING';
+  const classificationClass = classification.toLowerCase();
+  const sessionId = session._id?.toString?.() || session._id;
 
   row.innerHTML = `
-    <td>${session._id.slice(0, 8)}...</td>
+    <td>${String(sessionId).slice(0, 8)}...</td>
     <td>
       <span class="classification-badge ${classificationClass}">
-        ${session.classification}
+        ${classification}
       </span>
     </td>
     <td>
@@ -109,6 +111,9 @@ export const createSessionRow = (session) => {
     <td>${duration}</td>
     <td>${session.eventCount || 0}</td>
     <td>${startDate}</td>
+    <td>
+      <a href="/replay/${sessionId}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Replay</a>
+    </td>
   `;
 
   return row;
@@ -126,7 +131,7 @@ export const updateSessionsTable = (sessions) => {
   if (!sessions || sessions.length === 0) {
     const emptyRow = document.createElement('tr');
     emptyRow.className = 'loading-row';
-    emptyRow.innerHTML = '<td colspan="6">No sessions yet</td>';
+    emptyRow.innerHTML = '<td colspan="7">No sessions yet</td>';
     tbody.appendChild(emptyRow);
     return;
   }

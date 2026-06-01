@@ -12,6 +12,9 @@ const Dashboard = () => {
         <div class="dashboard-header">
           <h1>Admin Dashboard</h1>
           <p class="dashboard-subtitle">Real-time bot detection analytics and session monitoring</p>
+          <p id="dashboard-auth-hint" style="font-size: 0.875rem; color: #ff6b6b; margin-top: 0.5rem; display: none;">
+            Sign in as admin at <a href="/login">/login</a> (admin@botguard.local) to load protected dashboard data.
+          </p>
         </div>
 
         <!-- Statistics Section -->
@@ -42,11 +45,12 @@ const Dashboard = () => {
                     <th>Duration</th>
                     <th>Events</th>
                     <th>Started</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="sessions-tbody">
                   <tr class="loading-row">
-                    <td colspan="6">Loading sessions...</td>
+                    <td colspan="7">Loading sessions...</td>
                   </tr>
                 </tbody>
               </table>
@@ -141,7 +145,7 @@ const Dashboard = () => {
       }
 
       .stat-widget.bot {
-        border-left-color: #1e90ff;
+        border-left-color: #20c997;
       }
 
       .stat-widget.active {

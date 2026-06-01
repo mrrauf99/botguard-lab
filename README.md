@@ -1,283 +1,216 @@
 # BOTGUARD-LAB
 
-AI-powered bot detection platform with behavior tracking, analysis, and a simulator for testing bot detection mechanisms.
+AI-powered bot detection platform with behavior tracking, risk scoring, an admin dashboard, and a traffic simulator for end-to-end testing.
 
 ## Project Structure
 
 ```
 botguard-lab/
 ├── bot-detection-platform/     # Main detection platform
-│   ├── client/                 # React frontend
-│   ├── server/                 # Express backend
-│   └── docs/                   # Documentation
-├── bot-traffic-simulator/      # Bot simulation tool
-│   ├── client/                 # React frontend
-│   ├── server/                 # Express backend
-│   └── docs/                   # Documentation
-├── scripts/                    # Database seeds
-└── README.md                   # This file
+│   ├── client/                 # Vite + React frontend (marketing site + dashboard)
+│   ├── server/                 # Express API + Socket.io
+│   └── docs/                   # API & architecture docs
+├── bot-traffic-simulator/      # Bot / human traffic & attack simulator
+│   ├── client/                 # Simulator UI (Vite)
+│   └── server/                 # Traffic generation API
+└── README.md
 ```
+
+Database seeding lives in `bot-detection-platform/server/src/scripts/seedUsers.js` (50 Pakistani users + 1 admin).
 
 ## Tech Stack
 
-- **Frontend**: React 18, Vite, Axios
-- **Backend**: Express, Node.js
-- **Database**: MongoDB, Mongoose
-- **Auth**: JWT, bcryptjs
-- **Real-time**: Socket.io
-- **Testing**: Jest, React Testing Library
-- **Code Quality**: ESLint, Prettier
+| Layer | Technologies |
+|-------|----------------|
+| Frontend | React 18, Vite, vanilla JS page modules |
+| Backend | Express, Node.js (ES modules) |
+| Database | MongoDB, Mongoose |
+| Auth | JWT, bcryptjs |
+| Real-time | Socket.io (`/dashboard` namespace) |
+| Quality | ESLint, Prettier, Jest, React Testing Library |
 
 ## Requirements
 
-- Node.js >= 18.0.0
+- Node.js >= 18.0.0 (native `fetch` supported)
 - npm >= 9.0.0
 - MongoDB >= 5.0
 
 ## Quick Start
 
-### Installation
+### 1. Install
 
 ```bash
 npm install
 ```
 
-### Environment Setup
+### 2. Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your configuration:
+| Variable | Description |
+|----------|-------------|
+| `MONGODB_URI` | MongoDB connection (default: `mongodb://localhost:27017/botguard`) |
+| `JWT_SECRET` | Secret for signing JWTs (change in production) |
+| `PORT` | Detection server port (default: `5000`) |
+| `VITE_API_URL` | API URL for detection client (default: `http://localhost:5000`) |
+| `CORS_ORIGIN` | Allowed origins, comma-separated (default: `http://localhost:3000,http://localhost:5173`) |
 
-- `MONGODB_URI`: MongoDB connection string
-- `JWT_SECRET`: Secret key for JWT tokens
-- `PORT`: Server port (default: 5000)
-- `REACT_APP_API_URL`: API base URL for client
-
-### Development
-
-```bash
-npm run dev
-```
-
-This starts both the bot detection server and client in development mode.
-
-### Running Both Platforms Manually
-
-For full manual control of all services, open **4 separate terminals** and run:
-
-**Terminal 1: Detection Platform Server (Port 5000)**
-```bash
-cd bot-detection-platform/server
-npm run dev
-```
-
-**Terminal 2: Detection Platform Client (Port 3000)**
-```bash
-cd bot-detection-platform/client
-npm run dev
-```
-
-**Terminal 3: Traffic Simulator Server (Port 5001)**
-```bash
-cd bot-traffic-simulator/server
-npm run dev
-```
-
-**Terminal 4: Traffic Simulator Client (Port 5173)**
-```bash
-cd bot-traffic-simulator/client
-npm run dev
-```
-
-### Access Points
-
-| Service | URL | Purpose |
-|---------|-----|---------|
-| **Main Platform** | `http://localhost:3000` | Home, Login, Dashboard |
-| **Admin Dashboard** | `http://localhost:3000/dashboard` | Real-time stats & monitoring |
-| **Simulator UI** | `http://localhost:5173` | Bot traffic generator |
-
-### Quick Test Flow
-
-1. Open `http://localhost:3000` → Register/Login
-2. Open `http://localhost:3000/dashboard` → See empty stats
-3. Open `http://localhost:5173` → Simulator dashboard
-4. Click "Start Combined Traffic" (120 sec)
-5. Watch Dashboard auto-update with detection results
-6. See Notifications popup for bot detection alerts
-
-**Note:** MongoDB must be running locally (`mongodb://localhost:27017/botguard`)
-
-### Build
-
-```bash
-npm run build
-```
-
-Builds all packages for production.
-
-### Testing
-
-```bash
-npm test              # Run all tests
-npm run test:watch    # Watch mode
-npm run test:coverage # Coverage report
-```
-
-### Code Quality
-
-```bash
-npm run lint          # Check lint errors
-npm run lint:fix      # Fix lint errors
-npm run format        # Format code with Prettier
-npm run format:check  # Check formatting
-```
-
-## Pre-Commit Requirements
-
-All of the following must pass before committing:
-
-- ✅ Linting (`npm run lint`)
-- ✅ Tests (`npm test`)
-- ✅ Production build (`npm run build`)
-
-## Development Phases
-
-### Phase 1: ✅ Monorepo Foundation
-
-- ESLint, Prettier, Jest configuration
-- Environment variables setup
-- npm scripts
-- .gitignore configuration
-
-### Phase 2: Authentication & Database
-
-- MongoDB connection
-- Mongoose schemas
-- User model with JWT and bcrypt
-- Register/Login endpoints
-- 50 Pakistani seed users + 1 admin
-
-### Phase 3: Website Content
-
-- Home, Products, Blog pages
-- Product/Article detail pages
-- Contact & Authentication pages
-- Bright modern UI design
-
-### Phase 4: Behavior Tracking Engine
-
-- Mouse movement tracking
-- Scroll & click activity
-- Typing behavior
-- Session management
-
-### Phase 5: Detection Engine
-
-- Request rate analysis
-- Navigation pattern detection
-- Mouse/scroll presence detection
-- Bot classification (0-100 score)
-
-### Phase 6: Admin Dashboard
-
-- Session analytics
-- Real-time charts
-- Bot/Human/Suspicious statistics
-- Socket.io integration
-
-### Phase 7: Session Replay
-
-- Mouse movement replay
-- Scroll event replay
-- Click recording
-- Navigation timeline
-
-### Phase 8: Bot Traffic Simulator
-
-- Login attack simulation
-- Spam bot simulator
-- Scraper bot simulator
-- Detection result display
-
-### Phase 9: Analytics & Documentation
-
-- Analytics dashboard
-- History tracking
-- Report export
-- Full API documentation
-- Setup guides
-
-## Scripts
-
-### Root Commands
-
-```bash
-npm run lint                   # Run ESLint
-npm run lint:fix              # Fix ESLint issues
-npm run format                # Format all code
-npm run format:check          # Check formatting
-npm test                      # Run all tests
-npm run test:watch            # Watch mode
-npm run test:coverage         # Coverage report
-npm run dev                   # Start development servers
-npm run build                 # Build all packages
-npm run build:prod            # Production build
-npm run setup                 # Install and seed database
-npm run setup:db              # Seed database only
-```
-
-### Per-Package Commands
-
-Navigate to specific packages and use their individual scripts:
-
-```bash
-cd bot-detection-platform/server
-npm run dev                   # Start server
-npm run seed                  # Seed database
-```
-
-## Database Seeding
-
-Seed 50 Pakistani users + 1 admin:
+### 3. Seed database
 
 ```bash
 npm run setup:db
 ```
 
-Admin credentials:
+**Admin:** `admin@botguard.local` / `Admin@123`  
+**Sample user:** `ahmed_1@botguard.pk` / `Password123` (after seed)
 
-- Email: `admin@botguard.local`
-- Password: `Admin@123`
+### 4. Run services
 
-## API Documentation
+**Option A — detection platform only (root):**
 
-See [bot-detection-platform/docs/API.md](bot-detection-platform/docs/API.md) for detailed API documentation.
+```bash
+npm run dev
+```
+
+Starts detection server (5000) + client (3000).
+
+**Option B — all four services (recommended for full lab):**
+
+| Terminal | Command | URL |
+|----------|---------|-----|
+| 1 | `cd bot-detection-platform/server && npm run dev` | API `http://localhost:5000` |
+| 2 | `cd bot-detection-platform/client && npm run dev` | App `http://localhost:3000` |
+| 3 | `cd bot-traffic-simulator/server && npm run dev` | API `http://localhost:5001` |
+| 4 | `cd bot-traffic-simulator/client && npm run dev` | UI `http://localhost:5173` |
+
+## Access Points
+
+| Service | URL | Notes |
+|---------|-----|--------|
+| Main site | http://localhost:3000 | Home, Products, Blog, Contact, Login, Register |
+| Admin dashboard | http://localhost:3000/dashboard | **Requires admin login** (JWT) |
+| Session replay | http://localhost:3000/replay/:sessionId | Admin login recommended |
+| Simulator | http://localhost:5173 | Traffic + Phase 8 attacks |
+| Health check | http://localhost:5000/health | Detection API |
+
+## Quick Test Flow
+
+1. Start MongoDB locally.
+2. Run `npm run setup:db` if the database is empty.
+3. Open http://localhost:3000/login → sign in as **admin@botguard.local**.
+4. Open http://localhost:3000/dashboard → stats, charts, and sessions load (protected API).
+5. Open http://localhost:5173 → configure **Target URL** (`http://localhost:3000`) and **API URL** (`http://localhost:5000`).
+6. Run **Login Attack**, **Spam Bot**, or **Scraper Bot** (max 10 requests; stops on BOT / blocked session).
+7. Refresh the dashboard → see updated classifications and Socket.io detection events.
+
+## Features
+
+### Bot Detection Platform
+
+- **Website:** Home, Products, Product details, Blog, Article details, Contact, Login, Register
+- **Behavior tracking:** Mouse, scroll, click, typing, navigation, session duration, idle (server-side on session end)
+- **Detection engine:** Risk score 0–100 with classifications:
+  - `0–29` → HUMAN
+  - `30–59` → SUSPICIOUS
+  - `60–100` → BOT (session may be **blocked**)
+- **Signals:** Fast navigation, no mouse/scroll, high click/key rate, short session, spam submissions, sequential clicks, high event rate, repeated failed logins
+- **Admin dashboard:** Widgets, charts, recent sessions, high-risk alerts, session replay link
+- **Real-time:** Socket.io for detections and dashboard stat pushes after analysis
+- **Notifications:** In-app notification center for bot / high-risk events
+
+### Security (current)
+
+- Dashboard and session detail APIs require **admin JWT**
+- `/detection/analyze` and `/events/sessions/end` require **session token** (or JWT)
+- Rate limits on auth and event ingestion
+- Security headers + configurable CORS
+- Passwords hashed with bcrypt; not returned in API responses
+
+### Bot Traffic Simulator
+
+- Continuous **bot** / **human** / **combined** traffic
+- Single-session bot types (fast navigation, no interaction, form spam, click spam, suspicious)
+- **Phase 8 attack modes** (max 10 attempts each):
+  - **Login Attack** — repeated failed logins
+  - **Spam Bot** — form submission flood
+  - **Scraper Bot** — rapid navigation crawl
+- Configurable target URL and detection API URL
+- Displays status, requests sent, stopped reason, classification, and risk score
+
+## API Overview
+
+Base URL: `http://localhost:5000`
+
+| Prefix | Examples | Auth |
+|--------|----------|------|
+| `/auth` | `POST /register`, `POST /login`, `GET /me` | JWT for `/me` |
+| `/events` | `POST /sessions`, `POST /batch`, `POST /sessions/end` | Token for end; public create/batch |
+| `/detection` | `POST /analyze`, `GET /rules` | Token or JWT for analyze |
+| `/dashboard` | `GET /stats`, `GET /trends`, `GET /recent-sessions` | Admin JWT |
+| `/notifications` | `GET /`, `POST /mark-read` | JWT |
+
+Simulator API: `http://localhost:5001/simulator/…` — see `bot-traffic-simulator/docs/README.md`.
+
+Full reference: [bot-detection-platform/docs/API.md](bot-detection-platform/docs/API.md)
+
+## Scripts
+
+```bash
+npm run lint              # ESLint (all workspaces)
+npm run lint:fix
+npm run format            # Prettier write
+npm run format:check
+npm test                  # Jest (all packages)
+npm run test:coverage
+npm run build             # Production client builds
+npm run dev               # Detection server + client
+npm run setup             # install + seed
+npm run setup:db          # seed only
+```
+
+Per-package:
+
+```bash
+cd bot-detection-platform/server && npm run dev
+cd bot-detection-platform/server && npm run seed
+```
+
+## Pre-Commit Checklist
+
+Before committing, ensure:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+## Development Phases
+
+| Phase | Status | Summary |
+|-------|--------|---------|
+| 1 | Done | Monorepo, ESLint, Prettier, Jest, env, scripts |
+| 2 | Done | MongoDB, users, JWT auth, bcrypt, seed users |
+| 3 | Done | Marketing pages, bright UI, routing |
+| 4 | Done | Behavior events + sessions collections |
+| 5 | Done | Detection engine + scoring |
+| 6 | Done | Admin dashboard + Socket.io |
+| 7 | Done | Session replay viewer |
+| 8 | Done | Attack simulator (login / spam / scraper) |
+| 9 | Partial | Extended docs; analytics export TBD |
 
 ## Architecture
 
-See [bot-detection-platform/docs/ARCHITECTURE.md](bot-detection-platform/docs/ARCHITECTURE.md) for system architecture.
+See [bot-detection-platform/docs/ARCHITECTURE.md](bot-detection-platform/docs/ARCHITECTURE.md).
 
 ## Contributing
 
-1. Create feature branch: `git checkout -b feature/your-feature`
-2. Make changes and run quality checks:
-   ```bash
-   npm run lint:fix
-   npm test
-   npm run build
-   ```
-3. Commit with clear message: `git commit -m "add feature description"`
-4. Push to branch: `git push origin feature/your-feature`
-
-## Commit Message Guidelines
-
-- Use present tense: "add feature" not "added feature"
-- Use lowercase start: "update auth" not "Update auth"
-- Reference phases: "phase 2: add user model"
-- Keep it short and descriptive
+1. Branch from `main`: `git checkout -b feature/your-feature`
+2. Run lint, tests, and build (see above).
+3. Commit with a short, lowercase message: e.g. `fix batch event route`
+4. Open a pull request.
 
 ## License
 

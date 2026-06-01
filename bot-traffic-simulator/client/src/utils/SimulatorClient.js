@@ -215,6 +215,31 @@ class SimulatorClient {
     }
   }
 
+  async runAttack(type, config = {}) {
+    try {
+      const {
+        targetUrl = 'http://localhost:3000',
+        apiUrl = 'http://localhost:5000',
+      } = config;
+
+      const response = await fetch(`${this.apiUrl}/simulator/attack`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, targetUrl, apiUrl }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Attack failed');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.warn(`[SimulatorClient] Attack error: ${error.message}`);
+      throw error;
+    }
+  }
+
   /**
    * Start auto-refresh of status
    */

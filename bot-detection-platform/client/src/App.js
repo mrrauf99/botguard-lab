@@ -1,64 +1,86 @@
 import HomePage from './pages/Home';
+import ProductsPage from './pages/Products';
+import ProductDetailPage from './pages/ProductDetail';
+import BlogPage from './pages/Blog';
+import ArticleDetailPage from './pages/ArticleDetail';
+import ContactPage from './pages/Contact';
+import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import SessionReplayPage from './pages/SessionReplay';
 import BehaviorTracker from './utils/BehaviorTracker';
 import DetectionClient from './utils/DetectionClient';
 import DashboardSocket from './utils/DashboardSocket.js';
 import NotificationManager from './utils/NotificationManager.js';
+import { getApiUrl } from './utils/api.js';
 
-// Initialize behavior tracking on app load
+const getPathname = () => (typeof window !== 'undefined' ? window.location.pathname : '/');
+
 const initializeTracking = () => {
   try {
-    const tracker = new BehaviorTracker('http://localhost:5000');
+    const tracker = new BehaviorTracker(getApiUrl());
     tracker.startTracking();
     window.botguardTracker = tracker;
-    console.warn('[App] Behavior tracking initialized');
   } catch (error) {
     console.warn('[App] Error initializing behavior tracking:', error);
   }
 };
 
-// Initialize detection client on app load
 const initializeDetection = () => {
   try {
-    const client = new DetectionClient('http://localhost:5000');
+    const client = new DetectionClient(getApiUrl());
     window.botguardDetection = client;
-    console.warn('[App] Detection client initialized');
   } catch (error) {
     console.warn('[App] Error initializing detection client:', error);
   }
 };
 
-// Initialize dashboard socket on dashboard page
 const initializeDashboardSocket = () => {
   try {
-    const dashboardSocket = new DashboardSocket('http://localhost:5000');
+    const dashboardSocket = new DashboardSocket(getApiUrl());
     dashboardSocket.connect();
     dashboardSocket.loadDashboardData();
-    dashboardSocket.setupAutoRefresh(30000); // Refresh every 30 seconds
+    dashboardSocket.setupAutoRefresh(30000);
     window.dashboardSocket = dashboardSocket;
-    console.warn('[App] Dashboard socket initialized');
   } catch (error) {
     console.warn('[App] Error initializing dashboard socket:', error);
   }
 };
 
-// Initialize notification manager
 const initializeNotifications = () => {
   try {
-    const notificationManager = new NotificationManager('http://localhost:5000');
+    const notificationManager = new NotificationManager(getApiUrl());
     notificationManager.initialize();
     window.notificationManager = notificationManager;
-    console.warn('[App] Notification manager initialized');
   } catch (error) {
     console.warn('[App] Error initializing notification manager:', error);
   }
 };
 
-export default function App() {
-  // Get current page from URL pathname
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+const resolvePage = (pathname) => {
+  if (pathname.startsWith('/products/')) {
+    return ProductDetailPage(pathname.split('/').pop());
+  }
+  if (pathname.startsWith('/blog/')) {
+    return ArticleDetailPage(pathname.split('/').pop());
+  }
+  if (pathname.startsWith('/replay/')) {
+    return SessionReplayPage(pathname.split('/').pop());
+  }
 
-  // Initialize tracking and detection
+  if (pathname.includes('/dashboard')) return Dashboard();
+  if (pathname.includes('/products')) return ProductsPage();
+  if (pathname.includes('/blog')) return BlogPage();
+  if (pathname.includes('/contact')) return ContactPage();
+  if (pathname.includes('/login')) return LoginPage();
+  if (pathname.includes('/register')) return RegisterPage();
+
+  return HomePage();
+};
+
+export default function App() {
+  const pathname = getPathname();
+
   if (typeof window !== 'undefined') {
     if (!window.botguardTracker) {
       initializeTracking();
@@ -69,16 +91,11 @@ export default function App() {
     if (!window.notificationManager) {
       initializeNotifications();
     }
-  }
 
-  // Route to appropriate page
-  if (pathname.includes('/dashboard')) {
-    // Initialize dashboard socket only on dashboard page
-    if (typeof window !== 'undefined' && !window.dashboardSocket) {
+    if (pathname.includes('/dashboard') && !window.dashboardSocket) {
       initializeDashboardSocket();
     }
-    return Dashboard();
   }
 
-  return HomePage();
+  return resolvePage(pathname);
 }

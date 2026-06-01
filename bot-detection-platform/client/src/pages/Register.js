@@ -23,7 +23,7 @@ export const RegisterPage = () => {
           <h1 class="hero-title">Create Account</h1>
           <p class="hero-subtitle" style="margin-bottom: 2rem;">Join BotGuard to protect your applications</p>
 
-          <form class="card" onsubmit="alert('Registration functionality will be implemented with backend integration.'); return false;">
+          <form class="card" id="register-form">
             <div class="form-group">
               <label for="name" class="form-label">Full Name</label>
               <input

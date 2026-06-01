@@ -2,6 +2,8 @@ import './styles/global.css';
 import './styles/components.css';
 import './styles/notifications.css';
 import App from './App';
+import { setupPageHandlers } from './utils/pageInit.js';
+import { initSessionReplay } from './utils/sessionReplay.js';
 import {
   initializeNotificationCenter,
   updateNotificationBadge,
@@ -14,6 +16,21 @@ if (root) {
   const html = App();
   if (html) {
     root.innerHTML = html;
+
+    setupPageHandlers(window.location.pathname);
+
+    if (window.location.pathname.includes('/dashboard')) {
+      const token = localStorage.getItem('botguard_token');
+      const hint = document.getElementById('dashboard-auth-hint');
+      if (hint && !token) {
+        hint.style.display = 'block';
+      }
+    }
+
+    if (window.location.pathname.startsWith('/replay/')) {
+      const sessionId = window.location.pathname.split('/').pop();
+      initSessionReplay(sessionId);
+    }
 
     // Initialize notification center UI
     initializeNotificationCenter();

@@ -8,7 +8,7 @@ import {
   getNotificationStats,
   createTestNotification,
 } from '../controllers/notificationController.js';
-import { authenticateToken } from '../middleware/authMiddleware.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.post('/mark-all-read', authenticateToken, markAllAsRead);
 router.delete('/:notificationId', authenticateToken, deleteNotification);
 
 // Admin routes
-router.get('/admin/stats', getNotificationStats);
-router.post('/admin/test', createTestNotification);
+router.get('/admin/stats', authenticateToken, requireAdmin, getNotificationStats);
+router.post('/admin/test', authenticateToken, requireAdmin, createTestNotification);
 
 export default router;

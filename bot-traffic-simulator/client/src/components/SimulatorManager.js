@@ -31,6 +31,10 @@ const SimulatorManager = () => {
       btn.addEventListener('click', () => generateSingleHuman(btn.dataset.type));
     });
 
+    document.querySelectorAll('.btn-attack').forEach((btn) => {
+      btn.addEventListener('click', () => runAttack(btn.dataset.attack));
+    });
+
     // Action Buttons
     document.getElementById('btn-reset-stats')?.addEventListener('click', resetStats);
     document.getElementById('btn-refresh-status')?.addEventListener('click', refreshStatus);
@@ -206,6 +210,41 @@ const SimulatorManager = () => {
       addLog(`Generated ${type} human session (Session: ${result.sessionId})`, 'success');
     } catch (error) {
       addLog(`Error generating ${type} human: ${error.message}`, 'error');
+    }
+  };
+
+  const runAttack = async (type) => {
+    try {
+      const targetUrl = document.getElementById('attack-target-url')?.value || 'http://localhost:3000';
+      const apiUrl = document.getElementById('attack-api-url')?.value || 'http://localhost:5000';
+
+      document.querySelectorAll('.btn-attack').forEach((b) => {
+        b.disabled = true;
+      });
+
+      addLog(`Starting ${type}...`, 'info');
+      const result = await simulatorClient.runAttack(type, { targetUrl, apiUrl });
+
+      const resultPanel = document.getElementById('attack-result');
+      if (resultPanel) resultPanel.style.display = 'block';
+
+      document.getElementById('attack-status').textContent = result.status;
+      document.getElementById('attack-requests').textContent = result.requestsSent;
+      document.getElementById('attack-stopped').textContent = result.stoppedReason;
+      document.getElementById('attack-classification').textContent =
+        result.detection?.classification || '—';
+      document.getElementById('attack-score').textContent = result.detection?.riskScore ?? '—';
+
+      addLog(
+        `${type}: ${result.detection?.classification} (${result.detection?.riskScore}/100) — ${result.stoppedReason}`,
+        result.status === 'stopped' ? 'success' : 'info'
+      );
+    } catch (error) {
+      addLog(`Attack failed: ${error.message}`, 'error');
+    } finally {
+      document.querySelectorAll('.btn-attack').forEach((b) => {
+        b.disabled = false;
+      });
     }
   };
 

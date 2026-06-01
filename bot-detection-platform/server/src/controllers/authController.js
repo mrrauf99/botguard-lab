@@ -1,6 +1,18 @@
 import User from '../models/User.js';
+import LoginAttempt from '../models/LoginAttempt.js';
 import { generateToken } from '../utils/jwt.js';
 import { validateRegisterInput } from '../utils/validation.js';
+
+const getClientIp = (req) => req.ip || req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
+
+const recordLoginAttempt = async (req, email, success) => {
+  await LoginAttempt.create({
+    email: email?.toLowerCase(),
+    ipAddress: getClientIp(req),
+    success,
+    userAgent: req.headers['user-agent'],
+  });
+};
 
 export const register = async (req, res) => {
   try {
@@ -46,14 +58,17 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
+      await recordLoginAttempt(req, email, false);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
+      await recordLoginAttempt(req, email, false);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    await recordLoginAttempt(req, email, true);
     const token = generateToken(user._id, user.role);
 
     res.json({

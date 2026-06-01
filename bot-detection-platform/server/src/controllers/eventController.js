@@ -11,8 +11,9 @@ const generateSessionToken = () => {
 // Create a new session
 export const createSession = async (req, res) => {
   try {
-    const { pageUrl, userAgent, ipAddress, referer } = req.body;
+    const { pageUrl, userAgent, referer } = req.body;
     const userId = req.user?.id || null;
+    const ipAddress = req.body.ipAddress || req.ip;
 
     const sessionToken = generateSessionToken();
 
@@ -161,6 +162,7 @@ export const logEventsBatch = async (req, res) => {
     let scrollCount = 0;
     let clickCount = 0;
     let keyCount = 0;
+    let navigationCount = 0;
 
     events.forEach((event) => {
       switch (event.eventType) {
@@ -176,6 +178,9 @@ export const logEventsBatch = async (req, res) => {
         case 'keydown':
           keyCount += 1;
           break;
+        case 'navigation':
+          navigationCount += 1;
+          break;
         default:
           break;
       }
@@ -186,6 +191,7 @@ export const logEventsBatch = async (req, res) => {
     session.scrollEvents += scrollCount;
     session.clickEvents += clickCount;
     session.keyEvents += keyCount;
+    session.navigationEvents += navigationCount;
 
     await session.save();
 

@@ -23,6 +23,9 @@ class DetectionService {
       longIdle: 8,
       spamSubmissions: 12,
       sequentialClicks: 10,
+      highRequestRate: 14,
+      repeatedLogins: 18,
+      compositeBotSignals: 10,
     };
   }
 
@@ -32,7 +35,7 @@ class DetectionService {
    * @param {Array} events - Events for the session
    * @returns {Object} - { riskScore, classification, reasons }
    */
-  analyzeSession(session, events) {
+  analyzeSession(session, events, context = {}) {
     const reasons = [];
     let riskScore = 0;
 
@@ -55,6 +58,11 @@ class DetectionService {
     if (noScrollRules.triggered) {
       riskScore += this.weights.noScroll;
       reasons.push(noScrollRules.reason);
+    }
+
+    if (noMouseRules.triggered && noScrollRules.triggered) {
+      riskScore += this.weights.compositeBotSignals;
+      reasons.push('Composite bot signal: no mouse movement and no scrolling');
     }
 
     // Rule 4: High Click Rate
@@ -97,6 +105,20 @@ class DetectionService {
     if (sequentialClickRules.triggered) {
       riskScore += this.weights.sequentialClicks;
       reasons.push(sequentialClickRules.reason);
+    }
+
+    // Rule 10: High request / event rate
+    const highRequestRules = this.checkHighRequestRate(session);
+    if (highRequestRules.triggered) {
+      riskScore += this.weights.highRequestRate;
+      reasons.push(highRequestRules.reason);
+    }
+
+    // Rule 11: Repeated failed logins (same IP during window)
+    const repeatedLoginRules = this.checkRepeatedLogins(context);
+    if (repeatedLoginRules.triggered) {
+      riskScore += this.weights.repeatedLogins;
+      reasons.push(repeatedLoginRules.reason);
     }
 
     // Cap score at 100
@@ -291,6 +313,39 @@ class DetectionService {
       return {
         triggered: true,
         reason: `Repetitive clicking pattern: ${maxConsecutive} consecutive clicks on same element`,
+      };
+    }
+
+    return { triggered: false };
+  }
+
+  /**
+   * Rule 10: High event request rate for session duration
+   */
+  checkHighRequestRate(session) {
+    const durationSec = Math.max((session.duration || 1000) / 1000, 0.5);
+    const eventRate = (session.eventCount || 0) / durationSec;
+
+    if (eventRate > 8) {
+      return {
+        triggered: true,
+        reason: `High request rate: ${eventRate.toFixed(1)} events/sec`,
+      };
+    }
+
+    return { triggered: false };
+  }
+
+  /**
+   * Rule 11: Repeated failed login attempts from same IP
+   */
+  checkRepeatedLogins(context) {
+    const failedCount = context.recentFailedLogins || 0;
+
+    if (failedCount >= 5) {
+      return {
+        triggered: true,
+        reason: `Repeated login attempts: ${failedCount} failed logins in 15 minutes`,
       };
     }
 
