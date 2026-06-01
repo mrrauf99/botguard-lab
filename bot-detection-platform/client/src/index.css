@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-coral: #ff6b6b;
+  --color-coral-light: #ff8787;
+  --color-teal: #20c997;
+  --color-emerald: #1dd1a1;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-h-screen bg-white text-gray-900 antialiased;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+@keyframes notification-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-panel-enter {
+  animation: notification-slide-in 0.2s ease-out;
+}
