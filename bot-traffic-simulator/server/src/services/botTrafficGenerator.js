@@ -132,7 +132,7 @@ class BotTrafficGenerator {
       ];
 
       let timestamp = Date.now();
-      behaviors.forEach(behavior => {
+      behaviors.forEach((behavior) => {
         for (let i = 0; i < behavior.count; i++) {
           events.push({
             eventType: behavior.type,
@@ -191,7 +191,7 @@ class BotTrafficGenerator {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId,
-          events: events.map(e => ({
+          events: events.map((e) => ({
             sessionId,
             eventType: e.eventType,
             x: e.x || 0,
@@ -271,7 +271,7 @@ class BotTrafficGenerator {
         // Generate multiple bot types in parallel
         for (let i = 0; i < botTypesPerInterval; i++) {
           const botType = botTypes[Math.floor(Math.random() * botTypes.length)];
-          botType().catch(err => console.warn(`[BotTrafficGenerator] Error: ${err.message}`));
+          botType().catch((err) => console.warn(`[BotTrafficGenerator] Error: ${err.message}`));
         }
       }, intervalMs);
     });

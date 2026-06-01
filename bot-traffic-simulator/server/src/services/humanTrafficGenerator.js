@@ -69,9 +69,7 @@ class HumanTrafficGenerator {
             timestamp: new Date(timestamp + 2000 + j * 800),
             x: Math.floor(Math.random() * 1200),
             y: Math.floor(Math.random() * 800),
-            targetElement: ['a', 'button', '.product', '.card'][
-              Math.floor(Math.random() * 4)
-            ],
+            targetElement: ['a', 'button', '.product', '.card'][Math.floor(Math.random() * 4)],
             userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
           });
         }
@@ -119,9 +117,7 @@ class HumanTrafficGenerator {
 
       return sessionId;
     } catch (error) {
-      console.warn(
-        `[HumanTrafficGenerator] Generate human session error: ${error.message}`
-      );
+      console.warn(`[HumanTrafficGenerator] Generate human session error: ${error.message}`);
     }
   }
 
@@ -177,9 +173,7 @@ class HumanTrafficGenerator {
 
       return sessionId;
     } catch (error) {
-      console.warn(
-        `[HumanTrafficGenerator] Generate bouncer session error: ${error.message}`
-      );
+      console.warn(`[HumanTrafficGenerator] Generate bouncer session error: ${error.message}`);
     }
   }
 
@@ -219,7 +213,7 @@ class HumanTrafficGenerator {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId,
-          events: events.map(e => ({
+          events: events.map((e) => ({
             sessionId,
             eventType: e.eventType,
             x: e.x || 0,
@@ -282,10 +276,7 @@ class HumanTrafficGenerator {
     );
 
     const startTime = Date.now();
-    const sessionTypes = [
-      () => this.generateHumanSession(),
-      () => this.generateBouncerSession(),
-    ];
+    const sessionTypes = [() => this.generateHumanSession(), () => this.generateBouncerSession()];
 
     return new Promise((resolve) => {
       const interval = setInterval(async () => {
@@ -298,7 +289,7 @@ class HumanTrafficGenerator {
 
         // Generate random session type
         const sessionType = sessionTypes[Math.floor(Math.random() * sessionTypes.length)];
-        sessionType().catch(err => console.warn(`[HumanTrafficGenerator] Error: ${err.message}`));
+        sessionType().catch((err) => console.warn(`[HumanTrafficGenerator] Error: ${err.message}`));
       }, intervalMs);
     });
   }

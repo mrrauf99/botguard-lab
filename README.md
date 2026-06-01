@@ -63,6 +63,53 @@ npm run dev
 
 This starts both the bot detection server and client in development mode.
 
+### Running Both Platforms Manually
+
+For full manual control of all services, open **4 separate terminals** and run:
+
+**Terminal 1: Detection Platform Server (Port 5000)**
+```bash
+cd bot-detection-platform/server
+npm run dev
+```
+
+**Terminal 2: Detection Platform Client (Port 3000)**
+```bash
+cd bot-detection-platform/client
+npm run dev
+```
+
+**Terminal 3: Traffic Simulator Server (Port 5001)**
+```bash
+cd bot-traffic-simulator/server
+npm run dev
+```
+
+**Terminal 4: Traffic Simulator Client (Port 5173)**
+```bash
+cd bot-traffic-simulator/client
+npm run dev
+```
+
+### Access Points
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| **Main Platform** | `http://localhost:3000` | Home, Login, Dashboard |
+| **Admin Dashboard** | `http://localhost:3000/dashboard` | Real-time stats & monitoring |
+| **Simulator UI** | `http://localhost:5173` | Bot traffic generator |
+
+### Quick Test Flow
+
+1. Open `http://localhost:3000` → Register/Login
+2. Open `http://localhost:3000/dashboard` → See empty stats
+3. Open `http://localhost:5173` → Simulator dashboard
+4. Click "Start Combined Traffic" (120 sec)
+5. Watch Dashboard auto-update with detection results
+6. See Notifications popup for bot detection alerts
+
+**Note:** MongoDB must be running locally (`mongodb://localhost:27017/botguard`)
+
 ### Build
 
 ```bash

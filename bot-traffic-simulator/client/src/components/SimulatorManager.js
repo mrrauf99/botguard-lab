@@ -22,12 +22,12 @@ const SimulatorManager = () => {
     document.getElementById('btn-stop-combined')?.addEventListener('click', stopCombinedTraffic);
 
     // Bot Type Buttons
-    document.querySelectorAll('.btn-bot-type').forEach(btn => {
+    document.querySelectorAll('.btn-bot-type').forEach((btn) => {
       btn.addEventListener('click', () => generateSingleBot(btn.dataset.type));
     });
 
     // Human Type Buttons
-    document.querySelectorAll('.btn-human-type').forEach(btn => {
+    document.querySelectorAll('.btn-human-type').forEach((btn) => {
       btn.addEventListener('click', () => generateSingleHuman(btn.dataset.type));
     });
 
@@ -243,13 +243,12 @@ const SimulatorManager = () => {
     // Update traffic status
     if (status.active) {
       document.getElementById('bot-status').textContent = status.active.bot ? 'Running' : 'Stopped';
-      document.getElementById('human-status').textContent = status.active.human ? 'Running' : 'Stopped';
+      document.getElementById('human-status').textContent = status.active.human
+        ? 'Running'
+        : 'Stopped';
 
       document.getElementById('bot-indicator').classList.toggle('active', status.active.bot);
-      document.getElementById('human-indicator').classList.toggle(
-        'active',
-        status.active.human
-      );
+      document.getElementById('human-indicator').classList.toggle('active', status.active.human);
     }
 
     // Update stats
@@ -273,10 +272,8 @@ const SimulatorManager = () => {
     }
 
     // Update combined stats
-    const totalSessions =
-      (botStats?.totalSessions || 0) + (humanStats?.totalSessions || 0);
-    const totalEvents =
-      (botStats?.totalEvents || 0) + (humanStats?.totalEvents || 0);
+    const totalSessions = (botStats?.totalSessions || 0) + (humanStats?.totalSessions || 0);
+    const totalEvents = (botStats?.totalEvents || 0) + (humanStats?.totalEvents || 0);
 
     document.getElementById('stat-total-sessions').textContent = totalSessions;
     document.getElementById('stat-total-events').textContent = totalEvents;
