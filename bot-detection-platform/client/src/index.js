@@ -2,7 +2,11 @@ import './styles/global.css';
 import './styles/components.css';
 import './styles/notifications.css';
 import App from './App';
-import { initializeNotificationCenter, updateNotificationBadge, addNotificationItem } from './components/NotificationCenter.js';
+import {
+  initializeNotificationCenter,
+  updateNotificationBadge,
+  addNotificationItem,
+} from './components/NotificationCenter.js';
 
 const root = document.getElementById('root');
 if (root) {

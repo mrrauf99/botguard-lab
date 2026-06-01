@@ -1,4 +1,5 @@
-const root = document.getElementById('root');
-if (root) {
-  root.innerHTML = '<h1>Bot Traffic Simulator</h1>';
-}
+import App from './App.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  App();
+});

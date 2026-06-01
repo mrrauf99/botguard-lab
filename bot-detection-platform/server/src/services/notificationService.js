@@ -41,7 +41,9 @@ class NotificationService {
 
       // Broadcast to user if authenticated
       if (notification.userId) {
-        io.of('/dashboard').to(`user-${notification.userId}`).emit('user-notification', notification);
+        io.of('/dashboard')
+          .to(`user-${notification.userId}`)
+          .emit('user-notification', notification);
       }
 
       // Broadcast critical notifications to all
