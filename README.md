@@ -47,7 +47,7 @@ bot-detection-platform/client/src/
 ├── context/                 # AuthContext, NotificationContext
 ├── hooks/                   # useAuth, useNotifications, useDashboard
 ├── services/                # api, authService, notificationService
-└── utils/                   # BehaviorTracker, DetectionClient, chartDrawers
+└── utils/                   # BehaviorTracker, DetectionClient, replay helpers
 ```
 
 ## Requirements

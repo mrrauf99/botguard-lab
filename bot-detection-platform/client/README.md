@@ -56,7 +56,7 @@ src/
 ├── context/              # AuthContext, NotificationContext
 ├── hooks/                # useAuth, useNotifications, useDashboard
 ├── services/             # api, authService, notificationService
-└── utils/                # BehaviorTracker, DetectionClient, charts, replay
+└── utils/                # BehaviorTracker, DetectionClient, replay, notifications
 ```
 
 ## Routes

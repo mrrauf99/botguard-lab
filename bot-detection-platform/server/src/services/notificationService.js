@@ -1,12 +1,11 @@
 import mongoose from 'mongoose';
 import Notification from '../models/Notification.js';
+import { formatAttackLabel, inferAttackTypeSlug } from '../utils/attackTypeResolver.js';
 import { getIO } from './socketService.js';
 
 const SECURITY_TYPES = ['bot-detected', 'high-risk'];
 const DEDUP_WINDOW_MS = 5 * 60 * 1000;
 const HIGH_RISK_THRESHOLD = 60;
-
-import { formatAttackLabel, inferAttackTypeSlug } from '../utils/attackTypeResolver.js';
 
 class NotificationService {
   /**
@@ -103,7 +102,7 @@ class NotificationService {
 
   resolveAttackType(explicitAttackType, reasons = []) {
     if (explicitAttackType) {
-      return formatAttackLabel(explicitAttackType) || this.formatAttackLabel(explicitAttackType);
+      return formatAttackLabel(explicitAttackType);
     }
 
     const joined = reasons.join(' ').toLowerCase();
@@ -117,13 +116,6 @@ class NotificationService {
       return 'Scraper Bot';
     }
     return null;
-  }
-
-  formatAttackLabel(slug) {
-    return slug
-      .split('-')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
   }
 
   buildTriggers(classification, riskScore, reasons = []) {

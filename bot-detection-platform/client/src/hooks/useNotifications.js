@@ -13,7 +13,7 @@ import { useAuth } from './useAuth';
 
 const PAGE_SIZE = 20;
 
-export const getBadgeLabel = (unreadCount) => {
+const getBadgeLabel = (unreadCount) => {
   const count = Number(unreadCount) || 0;
   if (count <= 0) return null;
   if (count > 99) return '99+';
@@ -23,7 +23,7 @@ export const getBadgeLabel = (unreadCount) => {
 const countUnreadInList = (items) => items.filter((n) => !n.read).length;
 
 /** Badge matches unread items in the loaded list (not global DB count). */
-export const getEffectiveUnreadCount = (notifications, { loading = false } = {}) => {
+const getEffectiveUnreadCount = (notifications, { loading = false } = {}) => {
   const list = notifications ?? [];
   if (!loading && list.length === 0) return 0;
   return countUnreadInList(list);
@@ -142,10 +142,12 @@ export function useNotifications() {
     socket.on('user-notification', (n) => handleIncoming(n));
     socket.on('critical-alert', (n) => handleIncoming(n, { critical: true }));
 
+    const seenIdsRef = seenNotificationIdsRef;
+
     return () => {
       socket.disconnect();
       socketRef.current = null;
-      seenNotificationIdsRef.current.clear();
+      seenIdsRef.current.clear();
     };
   }, [isAuthenticated, loadNotifications]);
 
