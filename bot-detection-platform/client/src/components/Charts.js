@@ -244,7 +244,7 @@ export const updatePieChart = (stats) => {
   const data = [
     stats.classification.human || 0,
     stats.classification.suspicious || 0,
-    stats.classification.bot || 0
+    stats.classification.bot || 0,
   ];
 
   const labels = ['Human', 'Suspicious', 'Bot'];
@@ -272,8 +272,8 @@ export const updateBarChart = (distribution) => {
     return (aOrder[a._id] || 3) - (bOrder[b._id] || 3);
   });
 
-  const data = sorted.map(item => item.count);
-  const labels = sorted.map(item => item._id.split(' ')[0]); // Get range part
+  const data = sorted.map((item) => item.count);
+  const labels = sorted.map((item) => item._id.split(' ')[0]); // Get range part
   const colors = ['#1dd1a1', '#ff6b6b', '#1e90ff'];
 
   // Clear canvas
@@ -292,12 +292,12 @@ export const updateLineChart = (trends) => {
   const ctx = canvas.getContext('2d');
 
   // Extract dates and human counts
-  const labels = (trends || []).map(t => {
+  const labels = (trends || []).map((t) => {
     const date = new Date(t.date);
     return `${date.getMonth() + 1}/${date.getDate()}`;
   });
 
-  const data = (trends || []).map(t => (t.human || 0) + (t.suspicious || 0) + (t.bot || 0));
+  const data = (trends || []).map((t) => (t.human || 0) + (t.suspicious || 0) + (t.bot || 0));
 
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);

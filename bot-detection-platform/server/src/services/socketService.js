@@ -9,8 +9,8 @@ export const initializeSocketIO = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
       origin: ['http://localhost:3000', 'http://localhost:5173'],
-      methods: ['GET', 'POST']
-    }
+      methods: ['GET', 'POST'],
+    },
   });
 
   // Dashboard namespace for real-time updates
@@ -113,7 +113,9 @@ export const emitDetectionResult = (sessionId, result) => {
  */
 export const emitClassificationUpdate = (sessionId, classification) => {
   if (io) {
-    io.of('/dashboard').to('dashboard-sessions').emit('classification-update', { sessionId, classification });
+    io.of('/dashboard')
+      .to('dashboard-sessions')
+      .emit('classification-update', { sessionId, classification });
     console.warn(`[Socket.io] Classification update emitted: ${sessionId} -> ${classification}`);
   }
 };

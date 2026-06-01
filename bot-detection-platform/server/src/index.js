@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import detectionRoutes from './routes/detectionRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/auth', authRoutes);
 app.use('/events', eventRoutes);
 app.use('/detection', detectionRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/notifications', notificationRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'Bot Detection Platform Server is running' });

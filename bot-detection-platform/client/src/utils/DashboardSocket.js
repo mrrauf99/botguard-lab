@@ -1,5 +1,10 @@
 import { io } from 'https://cdn.socket.io/4.5.4/socket.io.esm.min.js';
-import { updateStatWidgets, updateSessionsTable, addAlertItem, clearAlerts } from '../components/Widgets.js';
+import {
+  updateStatWidgets,
+  updateSessionsTable,
+  addAlertItem,
+  clearAlerts,
+} from '../components/Widgets.js';
 import { updatePieChart, updateBarChart, updateLineChart } from '../components/Charts.js';
 
 class DashboardSocket {
@@ -22,7 +27,7 @@ class DashboardSocket {
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        reconnectionAttempts: 5
+        reconnectionAttempts: 5,
       });
 
       this.dashboardSocket.on('connect', () => {
@@ -68,7 +73,9 @@ class DashboardSocket {
 
       // Listen for classification updates
       this.dashboardSocket.on('classification-update', (data) => {
-        console.warn(`[DashboardSocket] Classification update: ${data.sessionId} -> ${data.classification}`);
+        console.warn(
+          `[DashboardSocket] Classification update: ${data.sessionId} -> ${data.classification}`
+        );
       });
 
       this.dashboardSocket.on('error', (error) => {
@@ -180,7 +187,7 @@ class DashboardSocket {
 
       // Clear old alerts and add new ones
       clearAlerts();
-      data.sessions.forEach(session => {
+      data.sessions.forEach((session) => {
         addAlertItem(session);
       });
 
@@ -203,7 +210,7 @@ class DashboardSocket {
         this.fetchTrends(7),
         this.fetchRiskDistribution(),
         this.fetchRecentSessions(10),
-        this.fetchHighRiskSessions(10)
+        this.fetchHighRiskSessions(10),
       ]);
 
       console.warn('[DashboardSocket] Dashboard data loaded');

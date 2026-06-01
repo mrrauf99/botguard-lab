@@ -5,7 +5,7 @@ import {
   getRiskDistribution,
   getTopReasons,
   getHighRiskSessions,
-  getSessionDetailedView
+  getSessionDetailedView,
 } from '../controllers/dashboardController.js';
 
 const router = express.Router();

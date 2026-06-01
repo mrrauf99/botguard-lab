@@ -1,9 +1,11 @@
 import Session from '../models/Session.js';
 import Event from '../models/Event.js';
 import DetectionService from '../services/detectionService.js';
+import NotificationService from '../services/notificationService.js';
 import { emitDetectionResult } from '../services/socketService.js';
 
 const detectionService = new DetectionService();
+const notificationService = new NotificationService();
 
 /**
  * Analyze single session
@@ -45,6 +47,20 @@ export const analyzeSession = async (req, res) => {
 
     // Emit real-time update
     emitDetectionResult(sessionId, analysis);
+
+    // Create notification if bot or high-risk
+    if (analysis.classification === 'BOT') {
+      await notificationService.notifyBotDetected(
+        sessionId,
+        analysis.classification,
+        analysis.riskScore,
+        analysis.reasons[0] || 'Bot behavior detected'
+      );
+    }
+
+    if (analysis.riskScore > 60) {
+      await notificationService.notifyHighRisk(sessionId, analysis.riskScore);
+    }
 
     res.json({
       sessionId: session._id,

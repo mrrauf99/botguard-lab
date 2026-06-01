@@ -46,7 +46,7 @@ export const updateStatWidgets = (stats) => {
     human: stats.classification?.human || 0,
     bot: stats.classification?.bot || 0,
     suspicious: stats.classification?.suspicious || 0,
-    active: stats.overview?.activeSessions || 0
+    active: stats.overview?.activeSessions || 0,
   };
 
   // Update values
@@ -90,9 +90,7 @@ export const updateStatWidgets = (stats) => {
 export const createSessionRow = (session) => {
   const row = document.createElement('tr');
 
-  const duration = session.duration
-    ? `${(session.duration / 1000).toFixed(1)}s`
-    : 'N/A';
+  const duration = session.duration ? `${(session.duration / 1000).toFixed(1)}s` : 'N/A';
 
   const startDate = new Date(session.startTime).toLocaleString();
 
@@ -133,7 +131,7 @@ export const updateSessionsTable = (sessions) => {
     return;
   }
 
-  sessions.forEach(session => {
+  sessions.forEach((session) => {
     const row = createSessionRow(session);
     tbody.appendChild(row);
   });

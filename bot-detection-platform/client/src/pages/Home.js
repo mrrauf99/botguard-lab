@@ -139,6 +139,28 @@ export const HomePage = () => {
         </div>
       </div>
     </footer>
+
+    <!-- Notification Center -->
+    <div class="notification-center" id="notification-center">
+      <div class="notification-header">
+        <h3>Notifications</h3>
+        <button class="notification-close-btn" id="notification-close">×</button>
+      </div>
+      <div class="notification-actions">
+        <button class="notification-btn" id="mark-all-read-btn">Mark all as read</button>
+        <button class="notification-btn secondary" id="clear-all-btn">Clear</button>
+      </div>
+      <div class="notification-list" id="notification-list">
+        <div class="notification-empty">No notifications yet</div>
+      </div>
+    </div>
+
+    <div class="notification-badge-container" id="notification-badge-container">
+      <button class="notification-toggle-btn" id="notification-toggle">
+        🔔
+        <span class="notification-badge" id="notification-badge">0</span>
+      </button>
+    </div>
   `;
 };
 

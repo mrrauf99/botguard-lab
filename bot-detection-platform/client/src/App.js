@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard';
 import BehaviorTracker from './utils/BehaviorTracker';
 import DetectionClient from './utils/DetectionClient';
 import DashboardSocket from './utils/DashboardSocket.js';
+import NotificationManager from './utils/NotificationManager.js';
 
 // Initialize behavior tracking on app load
 const initializeTracking = () => {
@@ -41,6 +42,18 @@ const initializeDashboardSocket = () => {
   }
 };
 
+// Initialize notification manager
+const initializeNotifications = () => {
+  try {
+    const notificationManager = new NotificationManager('http://localhost:5000');
+    notificationManager.initialize();
+    window.notificationManager = notificationManager;
+    console.warn('[App] Notification manager initialized');
+  } catch (error) {
+    console.warn('[App] Error initializing notification manager:', error);
+  }
+};
+
 export default function App() {
   // Get current page from URL pathname
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
@@ -52,6 +65,9 @@ export default function App() {
     }
     if (!window.botguardDetection) {
       initializeDetection();
+    }
+    if (!window.notificationManager) {
+      initializeNotifications();
     }
   }
 
