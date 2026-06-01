@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
+import detectionRoutes from './routes/detectionRoutes.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/events', eventRoutes);
+app.use('/detection', detectionRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'Bot Detection Platform Server is running' });
@@ -33,11 +35,13 @@ app.use((err, req, res) => {
 });
 
 // Connect to database and start server
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.warn(`Bot Detection Server running on port ${PORT}`);
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.warn(`Bot Detection Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.warn(`Failed to connect to database: ${err.message}`);
+    process.exit(1);
   });
-}).catch((err) => {
-  console.warn(`Failed to connect to database: ${err.message}`);
-  process.exit(1);
-});

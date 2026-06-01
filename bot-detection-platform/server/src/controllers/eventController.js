@@ -14,7 +14,7 @@ export const createSession = async (req, res) => {
     const userId = req.user?.id || null;
 
     const sessionToken = generateSessionToken();
-    
+
     const session = new Session({
       userId,
       sessionToken,
@@ -22,17 +22,17 @@ export const createSession = async (req, res) => {
       userAgent,
       ipAddress,
       referer,
-      status: 'active'
+      status: 'active',
     });
 
     await session.save();
 
     console.warn(`[Behavior Tracking] New session created: ${sessionToken}`);
-    
+
     res.status(201).json({
       sessionId: session._id,
       sessionToken: session.sessionToken,
-      message: 'Session created successfully'
+      message: 'Session created successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to create session: ${error.message}`);
@@ -68,8 +68,8 @@ export const logEvent = async (req, res) => {
       metadata: {
         userAgent: req.headers['user-agent'],
         ipAddress: req.ip,
-        referer: req.headers.referer
-      }
+        referer: req.headers.referer,
+      },
     });
 
     await event.save();
@@ -103,7 +103,7 @@ export const logEvent = async (req, res) => {
 
     res.status(201).json({
       eventId: event._id,
-      message: 'Event logged successfully'
+      message: 'Event logged successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to log event: ${error.message}`);
@@ -131,7 +131,7 @@ export const logEventsBatch = async (req, res) => {
     const referer = req.headers.referer;
 
     // Prepare events for bulk insertion
-    const eventDocuments = events.map(event => ({
+    const eventDocuments = events.map((event) => ({
       sessionId,
       userId: session.userId,
       eventType: event.eventType,
@@ -145,8 +145,8 @@ export const logEventsBatch = async (req, res) => {
       metadata: {
         userAgent,
         ipAddress,
-        referer
-      }
+        referer,
+      },
     }));
 
     // Insert all events
@@ -158,7 +158,7 @@ export const logEventsBatch = async (req, res) => {
     let clickCount = 0;
     let keyCount = 0;
 
-    events.forEach(event => {
+    events.forEach((event) => {
       switch (event.eventType) {
         case 'mousemove':
           mouseCount += 1;
@@ -185,11 +185,13 @@ export const logEventsBatch = async (req, res) => {
 
     await session.save();
 
-    console.warn(`[Behavior Tracking] Logged ${insertedEvents.length} events for session ${sessionId}`);
+    console.warn(
+      `[Behavior Tracking] Logged ${insertedEvents.length} events for session ${sessionId}`
+    );
 
     res.status(201).json({
       eventsLogged: insertedEvents.length,
-      message: 'Events logged successfully'
+      message: 'Events logged successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to batch log events: ${error.message}`);
@@ -217,14 +219,15 @@ export const endSession = async (req, res) => {
 
     // Calculate idle time based on events
     const events = await Event.find({ sessionId }).sort({ timestamp: 1 });
-    
+
     let maxIdlePeriod = 0;
     let totalIdleTime = 0;
 
     if (events.length > 1) {
       for (let i = 1; i < events.length; i++) {
         const timeDiff = events[i].timestamp - events[i - 1].timestamp;
-        if (timeDiff > 5000) { // Consider > 5 seconds as idle
+        if (timeDiff > 5000) {
+          // Consider > 5 seconds as idle
           totalIdleTime += timeDiff;
           maxIdlePeriod = Math.max(maxIdlePeriod, timeDiff);
         }
@@ -236,14 +239,16 @@ export const endSession = async (req, res) => {
 
     await session.save();
 
-    console.warn(`[Behavior Tracking] Session ended: ${sessionId}, Duration: ${session.duration}ms`);
+    console.warn(
+      `[Behavior Tracking] Session ended: ${sessionId}, Duration: ${session.duration}ms`
+    );
 
     res.json({
       sessionId: session._id,
       duration: session.duration,
       eventCount: session.eventCount,
       idleTime: session.idleTime,
-      message: 'Session ended successfully'
+      message: 'Session ended successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to end session: ${error.message}`);
@@ -266,7 +271,7 @@ export const getSessionDetails = async (req, res) => {
     res.json({
       session,
       events,
-      message: 'Session details retrieved successfully'
+      message: 'Session details retrieved successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to get session details: ${error.message}`);
@@ -283,14 +288,12 @@ export const getUserSessions = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const sessions = await Session.find({ userId })
-      .sort({ startTime: -1 })
-      .limit(50);
+    const sessions = await Session.find({ userId }).sort({ startTime: -1 }).limit(50);
 
     res.json({
       sessions,
       count: sessions.length,
-      message: 'User sessions retrieved successfully'
+      message: 'User sessions retrieved successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to get user sessions: ${error.message}`);
@@ -319,7 +322,7 @@ export const getAllSessions = async (req, res) => {
       total,
       limit: parseInt(limit),
       skip: parseInt(skip),
-      message: 'All sessions retrieved successfully'
+      message: 'All sessions retrieved successfully',
     });
   } catch (error) {
     console.warn(`[Error] Failed to get all sessions: ${error.message}`);

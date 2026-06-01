@@ -6,18 +6,18 @@ const eventSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Session',
       required: true,
-      index: true
+      index: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      index: true
+      index: true,
     },
     eventType: {
       type: String,
       enum: ['mousemove', 'scroll', 'click', 'keydown', 'navigation', 'form_submit'],
       required: true,
-      index: true
+      index: true,
     },
     x: Number,
     y: Number,
@@ -28,17 +28,17 @@ const eventSchema = new mongoose.Schema(
     timestamp: {
       type: Date,
       default: Date.now,
-      index: true
+      index: true,
     },
     metadata: {
       userAgent: String,
       ipAddress: String,
-      referer: String
-    }
+      referer: String,
+    },
   },
   {
     timestamps: true,
-    collection: 'events'
+    collection: 'events',
   }
 );
 

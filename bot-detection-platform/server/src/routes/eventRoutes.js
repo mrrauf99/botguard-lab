@@ -6,7 +6,7 @@ import {
   endSession,
   getSessionDetails,
   getUserSessions,
-  getAllSessions
+  getAllSessions,
 } from '../controllers/eventController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 

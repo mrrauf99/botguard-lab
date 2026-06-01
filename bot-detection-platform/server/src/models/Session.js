@@ -5,24 +5,24 @@ const sessionSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      index: true
+      index: true,
     },
     sessionToken: {
       type: String,
       unique: true,
       required: true,
-      index: true
+      index: true,
     },
     status: {
       type: String,
       enum: ['active', 'completed', 'abandoned'],
       default: 'active',
-      index: true
+      index: true,
     },
     startTime: {
       type: Date,
       default: Date.now,
-      index: true
+      index: true,
     },
     endTime: Date,
     duration: Number, // in milliseconds
@@ -30,67 +30,67 @@ const sessionSchema = new mongoose.Schema(
     userAgent: String,
     ipAddress: String,
     referer: String,
-    
+
     // Behavior tracking
     eventCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     mouseEvents: {
       type: Number,
-      default: 0
+      default: 0,
     },
     scrollEvents: {
       type: Number,
-      default: 0
+      default: 0,
     },
     clickEvents: {
       type: Number,
-      default: 0
+      default: 0,
     },
     keyEvents: {
       type: Number,
-      default: 0
+      default: 0,
     },
     navigationEvents: {
       type: Number,
-      default: 0
+      default: 0,
     },
     idleTime: {
       type: Number,
-      default: 0 // in milliseconds
+      default: 0, // in milliseconds
     },
     maxIdlePeriod: {
       type: Number,
-      default: 0 // longest period without activity
+      default: 0, // longest period without activity
     },
-    
+
     // Computed scores (to be filled by detection engine in Phase 5)
     riskScore: {
       type: Number,
       min: 0,
       max: 100,
-      default: 0
+      default: 0,
     },
     classification: {
       type: String,
       enum: ['HUMAN', 'SUSPICIOUS', 'BOT'],
-      default: 'HUMAN'
+      default: 'HUMAN',
     },
     detectionReasons: [String],
-    
+
     // Metadata
     flags: {
       hasFastNavigation: { type: Boolean, default: false },
       hasNoMouseMovement: { type: Boolean, default: false },
       hasNoScroll: { type: Boolean, default: false },
       hasUnusualClickPattern: { type: Boolean, default: false },
-      hasHighRequestRate: { type: Boolean, default: false }
-    }
+      hasHighRequestRate: { type: Boolean, default: false },
+    },
   },
   {
     timestamps: true,
-    collection: 'sessions'
+    collection: 'sessions',
   }
 );
 

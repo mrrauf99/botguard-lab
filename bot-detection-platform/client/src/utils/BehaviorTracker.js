@@ -26,8 +26,8 @@ class BehaviorTracker {
         body: JSON.stringify({
           pageUrl: window.location.href,
           userAgent: navigator.userAgent,
-          referer: document.referrer
-        })
+          referer: document.referrer,
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to create session');
@@ -118,7 +118,7 @@ class BehaviorTracker {
       eventType: 'mousemove',
       x: event.clientX,
       y: event.clientY,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -134,7 +134,7 @@ class BehaviorTracker {
       eventType: 'scroll',
       scrollX: window.scrollX,
       scrollY: window.scrollY,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -152,7 +152,7 @@ class BehaviorTracker {
       x: event.clientX,
       y: event.clientY,
       targetElement: target.tagName,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -167,7 +167,7 @@ class BehaviorTracker {
     this.addEvent({
       eventType: 'keydown',
       keyCode: event.keyCode,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -179,7 +179,7 @@ class BehaviorTracker {
 
     this.addEvent({
       eventType: 'navigation',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -220,8 +220,8 @@ class BehaviorTracker {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: this.sessionId,
-          events
-        })
+          events,
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to send events');
@@ -250,18 +250,53 @@ class BehaviorTracker {
       const response = await fetch(`${this.apiUrl}/events/sessions/end`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: this.sessionId })
+        body: JSON.stringify({ sessionId: this.sessionId }),
       });
 
       if (!response.ok) throw new Error('Failed to end session');
 
       console.warn(`[BehaviorTracker] Session ended: ${this.sessionToken}`);
 
+      // Trigger detection analysis
+      this.triggerDetection();
+
       // Clear session storage
       sessionStorage.removeItem('botguard_sessionId');
       sessionStorage.removeItem('botguard_sessionToken');
     } catch (error) {
       console.warn('[BehaviorTracker] Error ending session:', error);
+    }
+  }
+
+  /**
+   * Trigger detection analysis for session
+   */
+  async triggerDetection() {
+    if (!this.sessionId) return;
+
+    try {
+      // Check if detection client is available
+      if (typeof window === 'undefined' || !window.botguardDetection) {
+        console.warn('[BehaviorTracker] Detection client not available');
+        return;
+      }
+
+      const result = await window.botguardDetection.analyzeCurrentSession();
+
+      if (result) {
+        console.warn(
+          `[BehaviorTracker] Detection result: ${result.classification} (Score: ${result.riskScore})`
+        );
+
+        // Store for access
+        sessionStorage.setItem('botguard_detection_result', JSON.stringify(result));
+
+        // Dispatch custom event for UI integration
+        const event = new CustomEvent('botguard-detection-complete', { detail: result });
+        window.dispatchEvent(event);
+      }
+    } catch (error) {
+      console.warn('[BehaviorTracker] Error triggering detection:', error);
     }
   }
 
@@ -273,7 +308,7 @@ class BehaviorTracker {
       sessionId: this.sessionId,
       sessionToken: this.sessionToken,
       isTracking: this.isTracking,
-      bufferedEvents: this.eventBuffer.length
+      bufferedEvents: this.eventBuffer.length,
     };
   }
 }
