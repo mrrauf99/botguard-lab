@@ -1,6 +1,8 @@
 import HomePage from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import BehaviorTracker from './utils/BehaviorTracker';
 import DetectionClient from './utils/DetectionClient';
+import DashboardSocket from './utils/DashboardSocket.js';
 
 // Initialize behavior tracking on app load
 const initializeTracking = () => {
@@ -25,7 +27,24 @@ const initializeDetection = () => {
   }
 };
 
+// Initialize dashboard socket on dashboard page
+const initializeDashboardSocket = () => {
+  try {
+    const dashboardSocket = new DashboardSocket('http://localhost:5000');
+    dashboardSocket.connect();
+    dashboardSocket.loadDashboardData();
+    dashboardSocket.setupAutoRefresh(30000); // Refresh every 30 seconds
+    window.dashboardSocket = dashboardSocket;
+    console.warn('[App] Dashboard socket initialized');
+  } catch (error) {
+    console.warn('[App] Error initializing dashboard socket:', error);
+  }
+};
+
 export default function App() {
+  // Get current page from URL pathname
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+
   // Initialize tracking and detection
   if (typeof window !== 'undefined') {
     if (!window.botguardTracker) {
@@ -34,6 +53,15 @@ export default function App() {
     if (!window.botguardDetection) {
       initializeDetection();
     }
+  }
+
+  // Route to appropriate page
+  if (pathname.includes('/dashboard')) {
+    // Initialize dashboard socket only on dashboard page
+    if (typeof window !== 'undefined' && !window.dashboardSocket) {
+      initializeDashboardSocket();
+    }
+    return Dashboard();
   }
 
   return HomePage();

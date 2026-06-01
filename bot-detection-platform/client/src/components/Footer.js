@@ -1,13 +1,13 @@
 export const Footer = () => {
-  return (
-    <footer className="footer">
-      <div className="container">
-        <div className="footer-content">
-          <div className="footer-section">
+  return `
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
             <h4>BotGuard</h4>
             <p>AI-powered bot detection platform protecting your web applications.</p>
           </div>
-          <div className="footer-section">
+          <div class="footer-section">
             <h4>Product</h4>
             <ul>
               <li>
@@ -21,7 +21,7 @@ export const Footer = () => {
               </li>
             </ul>
           </div>
-          <div className="footer-section">
+          <div class="footer-section">
             <h4>Company</h4>
             <ul>
               <li>
@@ -35,7 +35,7 @@ export const Footer = () => {
               </li>
             </ul>
           </div>
-          <div className="footer-section">
+          <div class="footer-section">
             <h4>Legal</h4>
             <ul>
               <li>
@@ -50,12 +50,12 @@ export const Footer = () => {
             </ul>
           </div>
         </div>
-        <div className="footer-bottom">
+        <div class="footer-bottom">
           <p>&copy; 2026 BotGuard. All rights reserved.</p>
         </div>
       </div>
     </footer>
-  );
+  `;
 };
 
 export default Footer;

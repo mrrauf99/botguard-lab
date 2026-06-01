@@ -1,6 +1,7 @@
 import Session from '../models/Session.js';
 import Event from '../models/Event.js';
 import crypto from 'crypto';
+import { emitNewSession, emitSessionEnded } from '../services/socketService.js';
 
 // Generate unique session token
 const generateSessionToken = () => {
@@ -28,6 +29,9 @@ export const createSession = async (req, res) => {
     await session.save();
 
     console.warn(`[Behavior Tracking] New session created: ${sessionToken}`);
+
+    // Emit real-time update
+    emitNewSession(session);
 
     res.status(201).json({
       sessionId: session._id,
@@ -242,6 +246,9 @@ export const endSession = async (req, res) => {
     console.warn(
       `[Behavior Tracking] Session ended: ${sessionId}, Duration: ${session.duration}ms`
     );
+
+    // Emit real-time update
+    emitSessionEnded(sessionId, session);
 
     res.json({
       sessionId: session._id,

@@ -1,6 +1,7 @@
 import Session from '../models/Session.js';
 import Event from '../models/Event.js';
 import DetectionService from '../services/detectionService.js';
+import { emitDetectionResult } from '../services/socketService.js';
 
 const detectionService = new DetectionService();
 
@@ -41,6 +42,9 @@ export const analyzeSession = async (req, res) => {
     console.warn(
       `[Detection] Session analyzed: ${sessionId}, Score: ${analysis.riskScore}, Class: ${analysis.classification}`
     );
+
+    // Emit real-time update
+    emitDetectionResult(sessionId, analysis);
 
     res.json({
       sessionId: session._id,

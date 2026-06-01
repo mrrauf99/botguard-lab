@@ -1,12 +1,12 @@
 export const Navigation = () => {
-  return (
-    <nav className="navbar">
-      <div className="container">
-        <div className="navbar-container">
-          <a href="/" className="navbar-logo">
+  return `
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <a href="/" class="navbar-logo">
             BotGuard
           </a>
-          <ul className="navbar-nav">
+          <ul class="navbar-nav">
             <li>
               <a href="/">Home</a>
             </li>
@@ -19,19 +19,22 @@ export const Navigation = () => {
             <li>
               <a href="/contact">Contact</a>
             </li>
+            <li>
+              <a href="/dashboard" style="font-weight: 600; color: #20c997;">Dashboard</a>
+            </li>
           </ul>
-          <div className="navbar-auth">
-            <a href="/login" className="btn btn-outline">
+          <div class="navbar-auth">
+            <a href="/login" class="btn btn-outline">
               Login
             </a>
-            <a href="/register" className="btn btn-primary">
+            <a href="/register" class="btn btn-primary">
               Register
             </a>
           </div>
         </div>
       </div>
     </nav>
-  );
+  `;
 };
 
 export default Navigation;
