@@ -38,7 +38,7 @@ class AttackSimulator {
     return response.json();
   }
 
-  async endAndAnalyze(sessionId, sessionToken) {
+  async endAndAnalyze(sessionId, sessionToken, attackType = null) {
     await fetch(`${this.apiUrl}/events/sessions/end`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -48,7 +48,7 @@ class AttackSimulator {
     const response = await fetch(`${this.apiUrl}/detection/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, sessionToken }),
+      body: JSON.stringify({ sessionId, sessionToken, attackType }),
     });
 
     if (!response.ok) {
@@ -82,6 +82,14 @@ class AttackSimulator {
   async runLoginAttack() {
     const { sessionId, sessionToken } = await this.createSession();
     let requestsSent = 0;
+    const base = Date.now();
+    const events = [
+      {
+        eventType: 'navigation',
+        timestamp: new Date(base).toISOString(),
+        targetElement: `${this.targetUrl}/login`,
+      },
+    ];
 
     for (let i = 0; i < MAX_ATTEMPTS; i += 1) {
       requestsSent += 1;
@@ -93,27 +101,43 @@ class AttackSimulator {
           password: `wrong-password-${i}`,
         }),
       });
+
+      events.push({
+        eventType: 'login_attempt',
+        timestamp: new Date(base + (i + 1) * 400).toISOString(),
+        targetElement: `admin@botguard.local (attempt ${i + 1})`,
+      });
     }
 
-    const detection = await this.endAndAnalyze(sessionId, sessionToken);
+    await this.logBatch(sessionId, events);
+    console.warn(`[AttackSimulator] Login attack logged ${events.length} replay events for ${sessionId}`);
+
+    const detection = await this.endAndAnalyze(sessionId, sessionToken, 'login-attack');
     const stoppedReason = this.isStopped(detection) ? 'bot_detected' : null;
     return this.buildResult('login-attack', sessionId, requestsSent, detection, stoppedReason);
   }
 
   async runSpamBot() {
     const { sessionId, sessionToken } = await this.createSession();
-    const events = [];
+    const base = Date.now();
+    const events = [
+      {
+        eventType: 'navigation',
+        timestamp: new Date(base).toISOString(),
+        targetElement: `${this.targetUrl}/contact`,
+      },
+    ];
 
     for (let i = 0; i < MAX_ATTEMPTS; i += 1) {
       events.push({
         eventType: 'form_submit',
-        timestamp: new Date(Date.now() + i * 200).toISOString(),
+        timestamp: new Date(base + (i + 1) * 200).toISOString(),
         targetElement: 'form#contact',
       });
     }
 
     await this.logBatch(sessionId, events);
-    const detection = await this.endAndAnalyze(sessionId, sessionToken);
+    const detection = await this.endAndAnalyze(sessionId, sessionToken, 'spam-bot');
     const stoppedReason = this.isStopped(detection)
       ? detection.blocked
         ? 'session_blocked'
@@ -128,18 +152,26 @@ class AttackSimulator {
     let requestsSent = 0;
     let stoppedReason = null;
 
-    const events = [];
+    const base = Date.now();
+    const events = [
+      {
+        eventType: 'navigation',
+        timestamp: new Date(base).toISOString(),
+        targetElement: this.targetUrl,
+      },
+    ];
+
     for (let i = 0; i < MAX_ATTEMPTS; i += 1) {
       requestsSent += 1;
       events.push({
         eventType: 'navigation',
-        timestamp: new Date(Date.now() + i * 100).toISOString(),
+        timestamp: new Date(base + (i + 1) * 100).toISOString(),
         targetElement: `${this.targetUrl}/scrape-${i}`,
       });
     }
 
     await this.logBatch(sessionId, events);
-    const detection = await this.endAndAnalyze(sessionId, sessionToken);
+    const detection = await this.endAndAnalyze(sessionId, sessionToken, 'scraper-bot');
     if (this.isStopped(detection)) {
       stoppedReason = detection.blocked ? 'session_blocked' : 'bot_detected';
     }

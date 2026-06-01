@@ -32,3 +32,17 @@ body {
 .notification-panel-enter {
   animation: notification-slide-in 0.2s ease-out;
 }
+
+/* Pointer cursor on interactive controls */
+a,
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+label[for],
+select,
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

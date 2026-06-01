@@ -1,14 +1,10 @@
 import { memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getNotificationSessionId } from '../../services/notificationService';
-
-const TYPE_EMOJI = {
-  'bot-detected': '🤖',
-  'session-ended': '⏹️',
-  'high-risk': '⚠️',
-  anomaly: '❓',
-  system: 'ℹ️',
-};
+import {
+  getNotificationSessionId,
+  getSecurityNotificationDetails,
+  isSecurityNotification,
+} from '../../services/notificationService';
 
 function getTimeAgo(date) {
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -27,6 +23,8 @@ function NotificationItem({
   const navigate = useNavigate();
   const sessionId = getNotificationSessionId(notification);
   const isActionLoading = actionLoadingId === notification._id;
+  const isSecurity = isSecurityNotification(notification);
+  const details = isSecurity ? getSecurityNotificationDetails(notification) : null;
 
   const handleCardClick = useCallback(() => {
     if (sessionId) {
@@ -56,6 +54,9 @@ function NotificationItem({
     critical: 'border-l-red-500',
   };
 
+  const timeLabel = getTimeAgo(notification.createdAt);
+  const sessionShort = sessionId ? `${String(sessionId).slice(0, 8)}…` : null;
+
   return (
     <article
       role="button"
@@ -73,38 +74,45 @@ function NotificationItem({
       aria-label={notification.title}
     >
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-start gap-2">
-          <span aria-hidden="true">{TYPE_EMOJI[notification.type] || '📢'}</span>
-          <h4 className="flex-1 text-sm font-semibold text-gray-900">{notification.title}</h4>
-          <time className="shrink-0 text-xs text-gray-400" dateTime={notification.createdAt}>
-            {getTimeAgo(notification.createdAt)}
-          </time>
-        </div>
-        <p className="mt-1 text-sm text-gray-600 line-clamp-2">{notification.message}</p>
-        {sessionId && (
-          <p className="mt-1 text-xs text-teal">
-            Session: {String(sessionId).slice(0, 8)}… — tap to replay
-          </p>
+        <h4 className="text-sm font-semibold text-gray-900">{notification.title}</h4>
+
+        {isSecurity && details ? (
+          <div className="mt-1.5 space-y-0.5 text-xs text-gray-600">
+            {sessionShort && <p>Session: {sessionShort}</p>}
+            {details.riskScore != null && <p>Risk Score: {details.riskScore}/100</p>}
+            {details.attackType && <p>Attack Type: {details.attackType}</p>}
+            <p className="text-gray-400">{timeLabel}</p>
+            {sessionId && <p className="pt-1 font-medium text-teal">Tap to replay →</p>}
+          </div>
+        ) : (
+          <div className="mt-1.5 text-xs text-gray-600">
+            <p className="line-clamp-2">{notification.message}</p>
+            <p className="mt-1 text-gray-400">{timeLabel}</p>
+            {sessionId && <p className="pt-1 font-medium text-teal">Tap to replay →</p>}
+          </div>
         )}
       </div>
-      <div className="flex shrink-0 flex-col gap-1">
-        {!notification.read && (
+
+      <div className="flex shrink-0 items-start gap-1">
+        {!notification.read ? (
           <button
             type="button"
-            className="min-h-[36px] min-w-[36px] rounded-md bg-teal/10 px-2 text-xs font-medium text-teal hover:bg-teal/20 disabled:opacity-50"
+            className="min-h-[36px] min-w-[36px] cursor-pointer rounded-md bg-teal/10 px-2 text-xs font-medium text-teal hover:bg-teal/20 disabled:opacity-50"
             onClick={handleMarkRead}
             disabled={isActionLoading}
             aria-label="Mark as read"
+            title="Mark as read"
           >
             ✓
           </button>
-        )}
+        ) : null}
         <button
           type="button"
-          className="min-h-[36px] min-w-[36px] rounded-md bg-red-50 px-2 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-50"
+          className="min-h-[36px] min-w-[36px] cursor-pointer rounded-md bg-red-50 px-2 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-50"
           onClick={handleDelete}
           disabled={isActionLoading}
           aria-label="Delete notification"
+          title="Delete notification"
         >
           ✕
         </button>

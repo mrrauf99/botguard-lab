@@ -5,6 +5,7 @@ import DetectionService from '../services/detectionService.js';
 import NotificationService from '../services/notificationService.js';
 import { emitDetectionResult } from '../services/socketService.js';
 import { pushDashboardStatsUpdate } from '../services/dashboardStatsService.js';
+import { inferAttackTypeSlug } from '../utils/attackTypeResolver.js';
 
 const getRecentFailedLogins = async (ipAddress) => {
   if (!ipAddress) return 0;
@@ -24,7 +25,7 @@ const notificationService = new NotificationService();
  */
 export const analyzeSession = async (req, res) => {
   try {
-    const { sessionId } = req.body;
+    const { sessionId, attackType } = req.body;
 
     if (!sessionId) {
       return res.status(400).json({ error: 'sessionId is required' });
@@ -62,6 +63,14 @@ export const analyzeSession = async (req, res) => {
       session.status = 'blocked';
     }
 
+    session.attackType =
+      inferAttackTypeSlug({
+        attackType: attackType || session.attackType,
+        classification: analysis.classification,
+        detectionReasons: analysis.reasons,
+        flags: session.flags,
+      }) || session.attackType || null;
+
     await session.save();
 
     console.warn(
@@ -71,18 +80,14 @@ export const analyzeSession = async (req, res) => {
     emitDetectionResult(sessionId, analysis);
     await pushDashboardStatsUpdate();
 
-    // Create notification if bot or high-risk
-    if (analysis.classification === 'BOT') {
-      await notificationService.notifyBotDetected(
+    if (analysis.classification === 'BOT' || analysis.riskScore > 60) {
+      await notificationService.createSecurityNotification({
         sessionId,
-        analysis.classification,
-        analysis.riskScore,
-        analysis.reasons[0] || 'Bot behavior detected'
-      );
-    }
-
-    if (analysis.riskScore > 60) {
-      await notificationService.notifyHighRisk(sessionId, analysis.riskScore);
+        classification: analysis.classification,
+        riskScore: analysis.riskScore,
+        reasons: analysis.reasons,
+        attackType: session.attackType || null,
+      });
     }
 
     res.json({

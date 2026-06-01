@@ -3,12 +3,12 @@ import Button from '../ui/Button';
 import NotificationList from '../notifications/NotificationList';
 import { useNotificationContext } from '../../context/NotificationContext';
 import { useAuth } from '../../hooks/useAuth';
+import { unlockNotificationAudio } from '../../utils/notificationSound';
 
 function NotificationBell() {
   const { isAuthenticated } = useAuth();
   const {
     notifications,
-    unreadCount,
     loading,
     error,
     actionLoadingId,
@@ -16,8 +16,10 @@ function NotificationBell() {
     markAsRead,
     removeNotification,
     markAllRead,
-    clearAllLocal,
+    deleteAll,
     loadMore,
+    loadNotifications,
+    badgeLabel,
   } = useNotificationContext();
 
   const [open, setOpen] = useState(false);
@@ -44,10 +46,13 @@ function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleOutside);
   }, [open, close]);
 
-  if (!isAuthenticated) return null;
+  useEffect(() => {
+    if (open && isAuthenticated) {
+      loadNotifications(true);
+    }
+  }, [open, isAuthenticated, loadNotifications]);
 
-  const badgeLabel =
-    unreadCount > 99 ? '99+' : unreadCount > 0 ? String(unreadCount) : null;
+  if (!isAuthenticated) return null;
 
   return (
     <div className="relative">
@@ -55,12 +60,15 @@ function NotificationBell() {
         ref={toggleRef}
         type="button"
         className={`relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-gray-200 bg-white text-lg transition hover:border-teal ${
-          unreadCount > 0 ? 'ring-2 ring-teal/20' : ''
+          badgeLabel ? 'ring-2 ring-teal/20' : ''
         }`}
         aria-expanded={open}
         aria-haspopup="true"
-        aria-label={`Notifications${badgeLabel ? `, ${unreadCount} unread` : ''}`}
-        onClick={() => setOpen((v) => !v)}
+        aria-label={`Notifications${badgeLabel ? `, ${badgeLabel} unread` : ''}`}
+        onClick={() => {
+          unlockNotificationAudio();
+          setOpen((v) => !v);
+        }}
       >
         🔔
         {badgeLabel && (
@@ -89,13 +97,23 @@ function NotificationBell() {
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-2 border-b border-gray-100 px-3 py-2">
-            <Button variant="ghost" size="sm" onClick={markAllRead} disabled={!unreadCount}>
-              Mark all read
-            </Button>
-            <Button variant="ghost" size="sm" onClick={clearAllLocal}>
-              Clear view
-            </Button>
+          <div className="border-b border-gray-100 px-3 py-2">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="ghost" size="sm" onClick={markAllRead} disabled={!badgeLabel}>
+                Mark all read
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={deleteAll}
+                disabled={!notifications.length}
+              >
+                Delete all
+              </Button>
+            </div>
+            <p className="mt-1.5 text-xs text-gray-500">
+              ✓ marks one as read · ✕ removes it from your list (use after mark all read)
+            </p>
           </div>
 
           <NotificationList

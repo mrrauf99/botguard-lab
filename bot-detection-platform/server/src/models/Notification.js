@@ -29,6 +29,9 @@ const notificationSchema = new mongoose.Schema({
     riskScore: Number,
     classification: String,
     reason: String,
+    attackType: String,
+    attackTypeSlug: String,
+    triggers: [String],
   },
   read: {
     type: Boolean,
@@ -46,6 +49,7 @@ const notificationSchema = new mongoose.Schema({
 notificationSchema.index({ userId: 1, createdAt: -1 });
 notificationSchema.index({ userId: 1, read: 1 });
 notificationSchema.index({ type: 1, severity: 1 });
+notificationSchema.index({ 'data.sessionId': 1, createdAt: -1 });
 
 const Notification = mongoose.model('Notification', notificationSchema);
 

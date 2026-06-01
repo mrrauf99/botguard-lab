@@ -1,33 +1,52 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { getApiUrl } from '../services/api';
 import {
+  deleteAllNotifications,
   deleteNotificationById,
   fetchNotifications,
-  fetchUnreadCount,
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from '../services/notificationService';
+import { playNotificationSound } from '../utils/notificationSound';
 import { useAuth } from './useAuth';
 
 const PAGE_SIZE = 20;
 
+export const getBadgeLabel = (unreadCount) => {
+  const count = Number(unreadCount) || 0;
+  if (count <= 0) return null;
+  if (count > 99) return '99+';
+  return String(count);
+};
+
+const countUnreadInList = (items) => items.filter((n) => !n.read).length;
+
+/** Badge matches unread items in the loaded list (not global DB count). */
+export const getEffectiveUnreadCount = (notifications, { loading = false } = {}) => {
+  const list = notifications ?? [];
+  if (!loading && list.length === 0) return 0;
+  return countUnreadInList(list);
+};
+
 export function useNotifications() {
   const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [hasMore, setHasMore] = useState(false);
   const skipRef = useRef(0);
   const socketRef = useRef(null);
+  const seenNotificationIdsRef = useRef(new Set());
 
   const loadNotifications = useCallback(
     async (reset = true) => {
       if (!isAuthenticated) {
         setNotifications([]);
-        setUnreadCount(0);
+        setTotal(0);
+        seenNotificationIdsRef.current.clear();
         return;
       }
 
@@ -36,18 +55,26 @@ export function useNotifications() {
       const skip = reset ? 0 : skipRef.current;
 
       try {
-        const [listData, count] = await Promise.all([
-          fetchNotifications(PAGE_SIZE, skip),
-          fetchUnreadCount(),
-        ]);
-
+        const listData = await fetchNotifications(PAGE_SIZE, skip);
         const items = listData?.notifications ?? [];
-        setNotifications((prev) => (reset ? items : [...prev, ...items]));
-        setUnreadCount(count);
-        skipRef.current = reset ? items.length : skipRef.current + items.length;
-        setHasMore(items.length === PAGE_SIZE);
+        const totalCount = listData?.total ?? items.length;
+
+        items.forEach((n) => seenNotificationIdsRef.current.add(String(n._id)));
+
+        if (reset) {
+          setNotifications(items);
+          skipRef.current = items.length;
+        } else {
+          setNotifications((prev) => [...prev, ...items]);
+          skipRef.current += items.length;
+        }
+
+        setTotal(totalCount);
+        setHasMore(skipRef.current < totalCount);
       } catch (err) {
         setError(err.response?.data?.error || err.message || 'Failed to load notifications');
+        setNotifications([]);
+        setTotal(0);
       } finally {
         setLoading(false);
       }
@@ -60,10 +87,18 @@ export function useNotifications() {
     await loadNotifications(false);
   }, [hasMore, loading, loadNotifications]);
 
+  const effectiveUnread = useMemo(
+    () => getEffectiveUnreadCount(notifications, { loading }),
+    [notifications, loading]
+  );
+
+  const badgeLabel = useMemo(() => getBadgeLabel(effectiveUnread), [effectiveUnread]);
+
   useEffect(() => {
     if (!isAuthenticated) {
       setNotifications([]);
-      setUnreadCount(0);
+      setTotal(0);
+      seenNotificationIdsRef.current.clear();
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -86,24 +121,31 @@ export function useNotifications() {
       socket.emit('subscribe-detections');
     });
 
-    const handleIncoming = (notification) => {
+    const handleIncoming = (notification, { critical = false } = {}) => {
+      const id = String(notification._id);
+      if (seenNotificationIdsRef.current.has(id)) {
+        return;
+      }
+      seenNotificationIdsRef.current.add(id);
+
       setNotifications((prev) => {
-        const exists = prev.some((n) => n._id === notification._id);
-        if (exists) return prev;
-        return [notification, ...prev].slice(0, 100);
+        const next = [notification, ...prev].slice(0, 100);
+        return next;
       });
+
       if (!notification.read) {
-        setUnreadCount((c) => c + 1);
+        playNotificationSound(critical);
       }
     };
 
-    socket.on('new-notification', handleIncoming);
-    socket.on('user-notification', handleIncoming);
-    socket.on('critical-alert', handleIncoming);
+    socket.on('new-notification', (n) => handleIncoming(n));
+    socket.on('user-notification', (n) => handleIncoming(n));
+    socket.on('critical-alert', (n) => handleIncoming(n, { critical: true }));
 
     return () => {
       socket.disconnect();
       socketRef.current = null;
+      seenNotificationIdsRef.current.clear();
     };
   }, [isAuthenticated, loadNotifications]);
 
@@ -112,63 +154,49 @@ export function useNotifications() {
     setError(null);
 
     const previous = notifications;
-    const wasUnread = previous.find((n) => n._id === notificationId && !n.read);
 
-    setNotifications((list) =>
-      list.map((n) => (n._id === notificationId ? { ...n, read: true } : n))
-    );
-    if (wasUnread) {
-      setUnreadCount((c) => Math.max(0, c - 1));
-    }
+    setNotifications((list) => list.map((n) => (n._id === notificationId ? { ...n, read: true } : n)));
 
     try {
       await markNotificationAsRead(notificationId);
-      const count = await fetchUnreadCount();
-      setUnreadCount(count);
     } catch (err) {
       setNotifications(previous);
-      if (wasUnread) {
-        setUnreadCount((c) => c + 1);
-      }
       setError(err.response?.data?.error || err.message || 'Failed to mark as read');
     } finally {
       setActionLoadingId(null);
     }
   }, [notifications]);
 
-  const removeNotification = useCallback(async (notificationId) => {
-    setActionLoadingId(notificationId);
-    setError(null);
+  const removeNotification = useCallback(
+    async (notificationId) => {
+      setActionLoadingId(notificationId);
+      setError(null);
 
-    const previous = notifications;
-    const removed = previous.find((n) => n._id === notificationId);
+      const previous = notifications;
+      const previousTotal = total;
 
-    setNotifications((list) => list.filter((n) => n._id !== notificationId));
+      setNotifications((list) => list.filter((n) => n._id !== notificationId));
+      seenNotificationIdsRef.current.delete(String(notificationId));
+      setTotal((t) => Math.max(0, t - 1));
 
-    if (removed && !removed.read) {
-      setUnreadCount((c) => Math.max(0, c - 1));
-    }
-
-    try {
-      await deleteNotificationById(notificationId);
-      const count = await fetchUnreadCount();
-      setUnreadCount(count);
-    } catch (err) {
-      setNotifications(previous);
-      if (removed && !removed.read) {
-        setUnreadCount((c) => c + 1);
+      try {
+        await deleteNotificationById(notificationId);
+      } catch (err) {
+        setNotifications(previous);
+        setTotal(previousTotal);
+        setError(err.response?.data?.error || err.message || 'Failed to delete notification');
+      } finally {
+        setActionLoadingId(null);
       }
-      setError(err.response?.data?.error || err.message || 'Failed to delete notification');
-    } finally {
-      setActionLoadingId(null);
-    }
-  }, [notifications]);
+    },
+    [notifications, total]
+  );
 
   const markAllRead = useCallback(async () => {
     setError(null);
     const previous = notifications;
+
     setNotifications((list) => list.map((n) => ({ ...n, read: true })));
-    setUnreadCount(0);
 
     try {
       await markAllNotificationsAsRead();
@@ -179,14 +207,26 @@ export function useNotifications() {
     }
   }, [notifications, loadNotifications]);
 
-  const clearAllLocal = useCallback(() => {
-    setNotifications([]);
-    setUnreadCount(0);
-  }, []);
+  const deleteAll = useCallback(async () => {
+    setError(null);
+
+    try {
+      await deleteAllNotifications();
+      seenNotificationIdsRef.current.clear();
+      setNotifications([]);
+      setTotal(0);
+      setHasMore(false);
+      skipRef.current = 0;
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Failed to delete notifications');
+      await loadNotifications(true);
+    }
+  }, [loadNotifications]);
 
   return {
     notifications,
-    unreadCount,
+    unreadCount: effectiveUnread,
+    total,
     loading,
     error,
     actionLoadingId,
@@ -196,7 +236,8 @@ export function useNotifications() {
     markAsRead,
     removeNotification,
     markAllRead,
-    clearAllLocal,
+    deleteAll,
+    badgeLabel,
   };
 }
 

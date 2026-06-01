@@ -5,6 +5,7 @@ import {
   markAsRead,
   markAllAsRead,
   deleteNotification,
+  deleteAllNotifications,
   getNotificationStats,
   createTestNotification,
 } from '../controllers/notificationController.js';
@@ -17,6 +18,7 @@ router.get('/', authenticateToken, getUserNotifications);
 router.get('/unread-count', authenticateToken, getUnreadCount);
 router.post('/mark-read', authenticateToken, markAsRead);
 router.post('/mark-all-read', authenticateToken, markAllAsRead);
+router.delete('/all', authenticateToken, deleteAllNotifications);
 router.delete('/:notificationId', authenticateToken, deleteNotification);
 
 // Admin routes

@@ -15,7 +15,15 @@ const eventSchema = new mongoose.Schema(
     },
     eventType: {
       type: String,
-      enum: ['mousemove', 'scroll', 'click', 'keydown', 'navigation', 'form_submit'],
+      enum: [
+        'mousemove',
+        'scroll',
+        'click',
+        'keydown',
+        'navigation',
+        'form_submit',
+        'login_attempt',
+      ],
       required: true,
       index: true,
     },

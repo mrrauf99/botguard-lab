@@ -15,7 +15,7 @@ export const getUserNotifications = async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const { notifications, total } = await notificationService.getUserNotifications(
+    const { notifications, total, unreadCount } = await notificationService.getUserNotifications(
       userId,
       parseInt(limit),
       parseInt(skip)
@@ -24,6 +24,7 @@ export const getUserNotifications = async (req, res) => {
     res.json({
       notifications,
       total,
+      unreadCount,
       limit: parseInt(limit),
       skip: parseInt(skip),
       message: 'Notifications retrieved',
@@ -111,6 +112,30 @@ export const markAllAsRead = async (req, res) => {
   } catch (error) {
     console.warn(`[Error] Failed to mark all as read: ${error.message}`);
     res.status(500).json({ error: 'Failed to mark all as read' });
+  }
+};
+
+/**
+ * Delete all notifications visible to the user (user-scoped + global security alerts)
+ */
+export const deleteAllNotifications = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const result = await notificationService.deleteAllForUser(userId);
+
+    res.json({
+      deletedCount: result.deletedCount,
+      unreadCount: 0,
+      message: 'All notifications deleted',
+    });
+  } catch (error) {
+    console.warn(`[Error] Failed to delete all notifications: ${error.message}`);
+    res.status(500).json({ error: 'Failed to delete all notifications' });
   }
 };
 

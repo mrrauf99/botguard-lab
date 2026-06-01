@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import FormField, { Input } from '../components/ui/FormField';
+import PasswordInput from '../components/ui/PasswordInput';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../hooks/useAuth';
 
@@ -53,21 +54,21 @@ function Register() {
               />
             </FormField>
             <FormField label="Password" id="password">
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="new-password"
               />
             </FormField>
             <FormField label="Confirm Password" id="confirm">
-              <Input
+              <PasswordInput
                 id="confirm"
-                type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 required
+                autoComplete="new-password"
               />
             </FormField>
             {error && (
@@ -80,7 +81,7 @@ function Register() {
             </Button>
             <p className="mt-4 text-center text-sm text-gray-600">
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-teal hover:underline">
+              <Link to="/login" className="cursor-pointer font-semibold text-teal hover:underline">
                 Sign in
               </Link>
             </p>

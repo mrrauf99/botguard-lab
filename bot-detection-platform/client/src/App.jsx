@@ -5,6 +5,7 @@ import AppRoutes from './routes/AppRoutes';
 import BehaviorTracker from './utils/BehaviorTracker';
 import DetectionClient from './utils/DetectionClient';
 import { getApiUrl } from './services/api';
+import { unlockNotificationAudio } from './utils/notificationSound';
 
 export default function App() {
   useEffect(() => {
@@ -31,6 +32,17 @@ export default function App() {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
+
+    const unlockOnGesture = () => {
+      unlockNotificationAudio();
+    };
+    window.addEventListener('click', unlockOnGesture, { once: true });
+    window.addEventListener('keydown', unlockOnGesture, { once: true });
+
+    return () => {
+      window.removeEventListener('click', unlockOnGesture);
+      window.removeEventListener('keydown', unlockOnGesture);
+    };
   }, []);
 
   return (

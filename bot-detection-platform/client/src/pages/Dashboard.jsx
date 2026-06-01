@@ -1,12 +1,12 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '../components/ui/Badge';
 import Card from '../components/ui/Card';
 import Loader from '../components/ui/Loader';
 import PageHeader from '../components/ui/PageHeader';
 import Button from '../components/ui/Button';
+import DashboardAnalytics from '../components/dashboard/DashboardAnalytics';
 import { useDashboard } from '../hooks/useDashboard';
-import { drawBarChart, drawLineChart, drawPieChart } from '../utils/chartDrawers';
 
 function StatWidget({ label, value, accent, sub }) {
   return (
@@ -18,78 +18,21 @@ function StatWidget({ label, value, accent, sub }) {
   );
 }
 
-function DashboardCharts({ stats, distribution, trends }) {
-  const pieRef = useRef(null);
-  const barRef = useRef(null);
-  const lineRef = useRef(null);
-
-  useEffect(() => {
-    if (pieRef.current && stats?.classification) {
-      const ctx = pieRef.current.getContext('2d');
-      ctx.clearRect(0, 0, pieRef.current.width, pieRef.current.height);
-      drawPieChart(
-        ctx,
-        [
-          stats.classification.human || 0,
-          stats.classification.suspicious || 0,
-          stats.classification.bot || 0,
-        ],
-        ['Human', 'Suspicious', 'Bot'],
-        ['#1dd1a1', '#ff6b6b', '#20c997']
-      );
-    }
-  }, [stats]);
-
-  useEffect(() => {
-    if (barRef.current && distribution?.length) {
-      const sorted = [...distribution].sort((a, b) => {
-        const order = { '0-29 (Human)': 0, '30-59 (Suspicious)': 1, '60-100 (Bot)': 2 };
-        return (order[a._id] ?? 3) - (order[b._id] ?? 3);
-      });
-      const ctx = barRef.current.getContext('2d');
-      ctx.clearRect(0, 0, barRef.current.width, barRef.current.height);
-      drawBarChart(
-        ctx,
-        sorted.map((i) => i.count),
-        sorted.map((i) => i._id.split(' ')[0]),
-        ['#1dd1a1', '#ff6b6b', '#20c997']
-      );
-    }
-  }, [distribution]);
-
-  useEffect(() => {
-    if (lineRef.current && trends?.length) {
-      const labels = trends.map((t) => {
-        const d = new Date(t.date);
-        return `${d.getMonth() + 1}/${d.getDate()}`;
-      });
-      const data = trends.map((t) => (t.human || 0) + (t.suspicious || 0) + (t.bot || 0));
-      const ctx = lineRef.current.getContext('2d');
-      ctx.clearRect(0, 0, lineRef.current.width, lineRef.current.height);
-      drawLineChart(ctx, data, labels);
-    }
-  }, [trends]);
-
-  return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      {[
-        ['Classification Distribution', pieRef],
-        ['Risk Score Distribution', barRef],
-        ['Detection Trends', lineRef],
-      ].map(([title, ref]) => (
-        <Card key={title}>
-          <h3 className="mb-4 text-sm font-semibold text-gray-900 sm:text-base">{title}</h3>
-          <div className="overflow-x-auto">
-            <canvas ref={ref} width={300} height={200} className="mx-auto max-w-full" />
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
 function Dashboard() {
-  const { stats, trends, distribution, sessions, highRisk, loading, error } = useDashboard();
+  const {
+    stats,
+    sessions,
+    highRisk,
+    classificationSeries,
+    classificationGranularity,
+    setClassificationGranularity,
+    riskHeatmap,
+    detectionFunnel,
+    topReasons,
+    securityEvents,
+    loading,
+    error,
+  } = useDashboard();
 
   const classification = stats?.classification || {};
   const total = stats?.overview?.totalSessions || 0;
@@ -97,6 +40,7 @@ function Dashboard() {
   const bot = classification.bot || 0;
   const suspicious = classification.suspicious || 0;
   const active = stats?.overview?.activeSessions || 0;
+  const avgRisk = stats?.overview?.averageRiskScore || '0';
 
   const pct = (v) => (total === 0 ? '0%' : `${((v / total) * 100).toFixed(1)}%`);
 
@@ -113,29 +57,42 @@ function Dashboard() {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <PageHeader
           title="Admin Dashboard"
-          subtitle="Real-time bot detection analytics and session monitoring"
+          subtitle="Security analytics, detection trends, and live session monitoring"
         >
           {error && (
             <p className="mt-2 text-sm text-coral" role="alert">
               {error}.{' '}
               <Link to="/login" className="underline">
-                Sign in
+                Sign in as admin
               </Link>{' '}
-              to load protected data.
+              to load protected analytics.
             </p>
           )}
         </PageHeader>
 
         <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          <StatWidget label="Total Sessions" value={total} accent="border-l-gray-900" sub="All time" />
-          <StatWidget label="Human Visitors" value={human} accent="border-l-emerald" sub={pct(human)} />
-          <StatWidget label="Bot Traffic" value={bot} accent="border-l-teal" sub={pct(bot)} />
-          <StatWidget label="Suspicious" value={suspicious} accent="border-l-coral" sub={pct(suspicious)} />
-          <StatWidget label="Active Now" value={active} accent="border-l-teal" sub="Real-time" />
+          <StatWidget label="Total Sessions" value={total} accent="border-l-gray-900" sub="Classified" />
+          <StatWidget label="Human" value={human} accent="border-l-emerald" sub={pct(human)} />
+          <StatWidget label="BOT" value={bot} accent="border-l-red-500" sub={pct(bot)} />
+          <StatWidget label="Suspicious" value={suspicious} accent="border-l-orange-500" sub={pct(suspicious)} />
+          <StatWidget
+            label="Active / Avg risk"
+            value={active}
+            accent="border-l-teal"
+            sub={`Avg risk ${avgRisk}`}
+          />
         </div>
 
         <div className="mb-8">
-          <DashboardCharts stats={stats} distribution={distribution} trends={trends} />
+          <DashboardAnalytics
+            classificationSeries={classificationSeries}
+            classificationGranularity={classificationGranularity}
+            onGranularityChange={setClassificationGranularity}
+            riskHeatmap={riskHeatmap}
+            detectionFunnel={detectionFunnel}
+            topReasons={topReasons}
+            securityEvents={securityEvents}
+          />
         </div>
 
         <Card className="mb-8 overflow-hidden !p-0">

@@ -25,6 +25,11 @@ export const deleteNotificationById = async (notificationId) => {
   return data;
 };
 
+export const deleteAllNotifications = async () => {
+  const { data } = await api.delete('/notifications/all');
+  return data;
+};
+
 export const getNotificationSessionId = (notification) => {
   if (!notification) return null;
   const fromData = notification.data?.sessionId;
@@ -32,3 +37,21 @@ export const getNotificationSessionId = (notification) => {
   if (notification.sessionId) return String(notification.sessionId);
   return null;
 };
+
+export const getSecurityNotificationDetails = (notification) => {
+  const data = notification?.data || {};
+  const sessionId = getNotificationSessionId(notification);
+
+  return {
+    sessionId,
+    attackType: data.attackType || null,
+    classification: data.classification || null,
+    riskScore: data.riskScore ?? null,
+    reason: data.reason || null,
+    triggers: Array.isArray(data.triggers) ? data.triggers : [],
+    timestamp: notification?.createdAt || null,
+  };
+};
+
+export const isSecurityNotification = (notification) =>
+  ['bot-detected', 'high-risk'].includes(notification?.type);

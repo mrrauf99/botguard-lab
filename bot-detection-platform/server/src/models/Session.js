@@ -78,6 +78,10 @@ const sessionSchema = new mongoose.Schema(
       default: 'HUMAN',
     },
     detectionReasons: [String],
+    attackType: {
+      type: String,
+      default: null,
+    },
 
     // Metadata
     flags: {
