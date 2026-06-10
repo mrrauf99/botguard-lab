@@ -457,6 +457,14 @@ const SimulatorPage = () => {
           transform: translateY(-2px);
         }
 
+        .btn-bot-type:active,
+        .btn-human-type:active {
+          background: #d1fae5;
+          border-color: #0ca678;
+          transform: translateY(1px);
+          box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         /* Activity Log */
         .activity-log {
           background: #1f2937;

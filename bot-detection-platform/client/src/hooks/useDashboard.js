@@ -189,6 +189,18 @@ export function useDashboard() {
         .get('/dashboard/high-risk-sessions', { params: { limit: 10, threshold: 60 } })
         .then((res) => setHighRisk(res.data.sessions || []))
         .catch(() => {});
+      api
+        .get('/dashboard/recent-sessions', { params: { limit: 10 } })
+        .then((res) => setSessions(res.data.sessions || []))
+        .catch(() => {});
+    });
+
+    socket.on('new-session', (session) => {
+      setSessions((prev) => {
+        const exists = prev.some((s) => s._id === session._id);
+        if (exists) return prev;
+        return [session, ...prev].slice(0, 10);
+      });
     });
 
     socket.on('new-notification', prependSecurityEvent);

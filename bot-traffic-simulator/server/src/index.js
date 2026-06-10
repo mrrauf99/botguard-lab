@@ -3,10 +3,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import simulatorRoutes from './routes/simulatorRoutes.js';
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.SIMULATOR_PORT || 5001;
 
 app.use(cors());
 app.use(express.json());

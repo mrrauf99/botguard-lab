@@ -101,18 +101,21 @@ class HumanTrafficGenerator {
         });
       }
 
-      // Session duration: 20-60 seconds
+      // Session duration: 20-60 seconds (simulated accurately but asynchronously)
       const sessionDuration = 20000 + Math.random() * 40000;
-      await new Promise((resolve) => setTimeout(resolve, sessionDuration));
 
-      await this.logEventsBatch(sessionId, events);
-      await this.endSession(sessionId);
+      // Run sleep and logging in the background so the frontend doesn't freeze
+      (async () => {
+        await new Promise((resolve) => setTimeout(resolve, sessionDuration));
+        await this.logEventsBatch(sessionId, events);
+        await this.endSession(sessionId);
 
-      this.trafficStats.humansGenerated += 1;
-      this.trafficStats.avgSessionDuration =
-        (this.trafficStats.avgSessionDuration * (this.trafficStats.humansGenerated - 1) +
-          sessionDuration) /
-        this.trafficStats.humansGenerated;
+        this.trafficStats.humansGenerated += 1;
+        this.trafficStats.avgSessionDuration =
+          (this.trafficStats.avgSessionDuration * (this.trafficStats.humansGenerated - 1) +
+            sessionDuration) /
+          this.trafficStats.humansGenerated;
+      })().catch((err) => console.warn(`[HumanTrafficGenerator] Async error: ${err.message}`));
 
       return sessionId;
     } catch (error) {
@@ -163,12 +166,14 @@ class HumanTrafficGenerator {
       }
 
       // Quick session: 5-15 seconds
-      await new Promise((resolve) => setTimeout(resolve, 5000 + Math.random() * 10000));
+      // Run sleep and logging in the background so the frontend doesn't freeze
+      (async () => {
+        await new Promise((resolve) => setTimeout(resolve, 5000 + Math.random() * 10000));
+        await this.logEventsBatch(sessionId, events);
+        await this.endSession(sessionId);
 
-      await this.logEventsBatch(sessionId, events);
-      await this.endSession(sessionId);
-
-      this.trafficStats.humansGenerated += 1;
+        this.trafficStats.humansGenerated += 1;
+      })().catch((err) => console.warn(`[HumanTrafficGenerator] Async error: ${err.message}`));
 
       return sessionId;
     } catch (error) {

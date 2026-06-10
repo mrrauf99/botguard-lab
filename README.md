@@ -24,7 +24,7 @@ Database seeding lives in `bot-detection-platform/server/src/scripts/seedUsers.j
 |-------|----------------|
 | Frontend | React 18, React Router 6, Vite 5, Tailwind CSS 4, Axios, Socket.io client |
 | Backend | Express, Node.js (ES modules) |
-| Database | MongoDB, Mongoose |
+| Database | MongoDB, Mongoose (See [Schema Definition](bot-detection-platform/docs/MONGODB_SCHEMA.md)) |
 | Auth | JWT (`botguard_token` in localStorage), bcryptjs |
 | Real-time | Socket.io (`/dashboard` namespace) |
 | Quality | ESLint, Prettier, Jest |
@@ -72,11 +72,13 @@ cp .env.example .env
 
 | Variable | Description |
 |----------|-------------|
-| `MONGODB_URI` | MongoDB connection (default: `mongodb://localhost:27017/botguard`) |
+| `MONGODB_URI` | MongoDB connection string (See [Schema Doc](bot-detection-platform/docs/MONGODB_SCHEMA.md)) |
 | `JWT_SECRET` | Secret for signing JWTs (change in production) |
-| `PORT` | Detection server port (default: `5000`) |
-| `VITE_API_URL` | API URL for detection client (default: `http://localhost:5000`) |
-| `CORS_ORIGIN` | Allowed origins, comma-separated (default: `http://localhost:3000,http://localhost:5173`) |
+| `PORT` | Detection API Backend port (default: `5000`) |
+| `VITE_API_URL` | API URL for Detection Frontend App (default: `http://localhost:5000`) |
+| `SIMULATOR_PORT` | Simulator API Backend port (default: `5001`) |
+| `VITE_SIMULATOR_API_URL`| API URL for Simulator Frontend UI (default: `http://localhost:5001`) |
+| `CORS_ORIGIN` | Allowed origins, comma-separated (default: `http://localhost:3000,http://localhost:3001`) |
 
 ### 3. Seed database
 
@@ -104,7 +106,7 @@ Starts detection server (5000) + client (3000).
 | 1 | `cd bot-detection-platform/server && npm run dev` | API `http://localhost:5000` |
 | 2 | `cd bot-detection-platform/client && npm run dev` | App `http://localhost:3000` |
 | 3 | `cd bot-traffic-simulator/server && npm run dev` | API `http://localhost:5001` |
-| 4 | `cd bot-traffic-simulator/client && npm run dev` | UI `http://localhost:5173` |
+| 4 | `cd bot-traffic-simulator/client && npm run dev` | UI `http://localhost:3001` |
 
 ## Access Points
 
@@ -115,7 +117,7 @@ Starts detection server (5000) + client (3000).
 | Admin dashboard | http://localhost:3000/dashboard | **Requires JWT** (admin recommended for full API data) |
 | Session replay | http://localhost:3000/replay/:sessionId | Protected route |
 | Profile / Settings | http://localhost:3000/profile, `/settings` | Protected routes |
-| Simulator | http://localhost:5173 | Traffic + Phase 8 attacks |
+| Simulator | http://localhost:3001 | Traffic + Phase 8 attacks |
 | Health check | http://localhost:5000/health | Detection API |
 
 ### Client routes
@@ -135,7 +137,7 @@ When a valid token exists, visiting `/` redirects to `/dashboard`. Unauthorized 
 3. Open http://localhost:3000/login → sign in as **admin@botguard.local**.
 4. You should land on http://localhost:3000/dashboard (stats, charts, sessions).
 5. Use the **notification bell** → mark read, delete, or click a card to open session replay.
-6. Open http://localhost:5173 → set **Target URL** (`http://localhost:3000`) and **API URL** (`http://localhost:5000`).
+6. Open http://localhost:3001 → set **Target URL** (`http://localhost:3000`) and **API URL** (`http://localhost:5000`).
 7. Run **Login Attack**, **Spam Bot**, or **Scraper Bot** (max 10 requests; stops on BOT / blocked session).
 8. Refresh the dashboard → see updated classifications and Socket.io events.
 

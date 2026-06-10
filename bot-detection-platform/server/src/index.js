@@ -11,7 +11,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import { securityHeaders } from './middleware/securityHeaders.js';
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const app = express();
 const httpServer = http.createServer(app);
